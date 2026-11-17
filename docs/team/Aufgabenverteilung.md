@@ -19,16 +19,17 @@
 | Person C | – |
 | Person D | – |
 
-**Folge:** Bis zum 14.12. übernehmen **Amar, Person C und Person D die großen Code-Pakete**. Saifudin bekommt ein kleineres Code-Paket und pflegt das Modell.
+**Folge:** Bis zum 14.12. übernehmen **Amar, Person C und Person D die großen Code-Pakete** (je 21 Punkte). Saifudin bekommt das kleinste Paket (13 Punkte).
 
 ## Verteilung
+Die Aufgaben stehen als User Stories mit Akzeptanzkriterien, Punkten und Sprint im **[Backlog](Backlog.md)**.
 
-| Person | Rolle | Code-Paket (eigener Anteil) | Ergebnis bis 14.12.2026 |
-|---|---|---|---|
-| **Amar** | Integration (Technik) | **Messaging und Integration:** ActiveMQ-Queues; Camel-Route „Bestellung“ aus der JMS-Queue mit **CBR** an mindestens 2 Ziele (Datei/DB-Tabelle), **XML↔JSON**; **Lieferant-Simulation** (Postman/Datei → JMS → Camel → `POST /message` für `Lieferant_Bestellantwort_Team2` und `Lieferant_Versandmeldung_Team2`); Stubs für Team 3 (Nachfass- und Klärungsauftrag, Klärungsergebnis) | Bestellung läuft vom Prozess über JMS/Camel zum Lieferanten und die Antwort zurück in die wartende Instanz |
-| **Person C** | Technische Umsetzung | **Persistenz und Services:** MySQL-Schema; JPA-Entities `Versorgungsprofil`, `Bestand`, `Bestellung`, `Lieferung` mit **Panache im Repository-Stil** (Stiehl: kein `extends PanacheEntity`), `@ApplicationScoped`; REST-API (Quarkus) für die **Pflege-App-Simulation**: Bestand melden, Kundenentscheidung, Kenntnisnahme, Lieferbestätigung → Nachricht an die Engine; Auslösen des bedingten Starts (`POST /condition`) nach jeder Bestandsänderung; Datenbankabzug | Bestand und Profile liegen in MySQL; die App-Simulation kann alle Antworten an den Prozess schicken |
-| **Person D** | Prozesslogik + Test und Dokumentation | **External-Task-Worker und Regeln:** Worker (Quarkus) für die Service-Aufgaben (Reichweite berechnen, Vorschlag, Abweichungen prüfen, Bestand fortschreiben, Prüfung terminieren); **DMN** „Nachversorgungsbedarf“ und **„Berechtigungsregel“** (gemeinsame Funktion für alle Teams); Deploy-Test auf CIB seven; Testdaten (PH-0001 Bergmann, Testprodukt M); Startanleitung | Happy Path läuft in CIB seven von Start bis „Nachversorgung abgeschlossen“ (mit Simulationen) |
-| **Saifudin** | Prozess und Fachlichkeit, Integrationskreis | **Eventing und Freigabe-Baustein:** **Esper**-Komponente (z. B. Verbrauchsprognose aus Bestandsänderungen oder doppelte Ereignisse erkennen, Einsatz mit Stiehl klären); **Benachrichtigungs-Worker** (Sendeaufgaben an die Pflege-App); Schnittstellenvereinbarung **Kundenentscheidung** mit Team 1 und 3 (Vorlage D); BPMN pflegen | Esper läuft mit einer Regel; Kundenentscheidung ist mit Team 1/3 abgestimmt |
+| Person | Rolle | Code-Paket (eigener Anteil) | Stories | Punkte |
+|---|---|---|---|---|
+| **Amar** | Integration (Technik) | Messaging und Integration: ActiveMQ, Camel (CBR, XML↔JSON), Lieferant-Simulation, Stubs für Team 3 | T2-14 bis T2-17 | 21 |
+| **Person C** | Technische Umsetzung | Persistenz (JPA/Panache Repository-Stil, MySQL), REST für die Pflege-App-Simulation, bedingter Start, **Esper** | T2-03, 04, 05, 12, 18 | 21 |
+| **Person D** | Prozesslogik | External-Task-Worker, DMN „Nachversorgungsbedarf“ und „Berechtigungsregel“, Deploy auf CIB seven, Projektstruktur | T2-02, 06, 07, 08, 09, 10 | 21 |
+| **Saifudin** | Prozess und Fachlichkeit, Integrationskreis | Benachrichtigungs-Worker, Schnittstelle Kundenentscheidung, Testdaten, Startanleitung, BPMN pflegen | T2-11, 13, 19, 20, 22 | 13 |
 
 **Vertretungen:** Amar ↔ Person C (beide arbeiten an den Nachrichten zur Engine), Person D ↔ Saifudin (Prozess und Worker).
 
@@ -42,22 +43,14 @@
   - Geschäftsmodell und Zukunft: Person D
 - **Wochenstatus** (Vorlage B): reihum. Wer dran ist, schreibt ihn nach dem Teamtermin ins Repo.
 
-## Zeitplan bis zum Meilenstein 14.12.2026
-
-| Woche | Amar | Person C | Person D | Saifudin |
-|---|---|---|---|---|
-| **bis 24.11.** | ActiveMQ + Camel aufsetzen, Queue-Namen festlegen | MySQL + Quarkus-Projekt, Entities und Repositories | CIB seven lokal, Deploy der 5 BPMN-Dateien, Worker-Grundgerüst | Schnittstelle Kundenentscheidung (Vorlage D) an Team 1/3; Esper-Einsatz mit Stiehl klären |
-| **bis 01.12.** (Statusrunde Ende November) | Route Bestellung mit CBR + XML↔JSON | REST-Endpunkte der App-Simulation | Worker Bedarfsermittlung + DMN Nachversorgungsbedarf | Benachrichtigungs-Worker |
-| **bis 08.12.** | Lieferant-Simulation → Engine | `POST /condition`, Testdaten in der DB | Worker Bestellfreigabe + DMN Berechtigungsregel | Esper-Regel läuft |
-| **bis 14.12.** | Gemeinsamer Probelauf: **Happy Path Ende zu Ende** (alle) | | | |
-
-Nach dem 14.12.: Ausnahmewege (Fristen, Ablehnung, Teillieferung), Probelauf mit Team 1 und 3, Pitch, Abgabe von Code und Datenbankabzug.
+## Zeitplan
+Sprint 1 (17.11.–30.11.) und Sprint 2 (01.12.–14.12., Meilenstein 2: Happy Path Ende zu Ende) stehen mit allen Stories im [Backlog](Backlog.md). Sprint 3 bis zur Abgabe: Ausnahmewege, Probelauf mit Team 1/3, Pitch, Abgabe von Code und Datenbankabzug.
 
 ## Interne Arbeitsweise
 | Punkt | Vereinbarung |
 |---|---|
 | Teamtermin | 1× pro Woche, 30 Minuten (Tag festlegen) |
-| Aufgabenbrett | GitHub Issues im Repo, je Aufgabe eine verantwortliche Person |
+| Aufgabenbrett | [Backlog](Backlog.md), später als GitHub Issues, je Story eine verantwortliche Person |
 | Entscheidungen | `docs/entscheidungen/README.md` (Vorlage C) |
 | Integrationskreis | Saifudin (Vertretung: Person D) |
 | Code-Änderungen | über Branch + Pull Request, eine zweite Person schaut drüber |
