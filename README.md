@@ -15,6 +15,7 @@ für Kundenfreigaben, Benachrichtigungen und Berechtigungsgrenzen.
 | `prozesse/team2/` | BPMN-Modelle (CIB seven / Camunda 7), Bilder, Erläuterung → [README](prozesse/team2/README.md) |
 | `docs/schnittstellen/` | Schnittstellenvorschläge für den Integrationskreis |
 | `docs/entscheidungen/` | Entscheidungsprotokoll |
+| `docs/team/` | Aufgabenverteilung und Rollen im Team → [Aufgabenverteilung](docs/team/Aufgabenverteilung.md) |
 | `werkzeuge/` | Prüfskript für Stilregeln und Label-Matching |
 | `unterlagen/` | Kickoff-Unterlagen und Projektvorgaben von Prof. Stiehl (nicht MIT) |
 
