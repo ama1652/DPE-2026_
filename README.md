@@ -19,7 +19,7 @@ für Kundenfreigaben, Benachrichtigungen und Berechtigungsgrenzen.
 | `unterlagen/` | Kickoff-Unterlagen und Projektvorgaben von Prof. Stiehl (nicht MIT) |
 
 ## Stand
-- [x] BPMN: Prüflauf, Hauptprozess und 7 Teilprozesse (inkl. gemeinsamer Baustein Kundenentscheidung) → [Erklärung, Schwächen, offene Fragen](prozesse/team2/MODELL_ERKLAERUNG.md)
+- [x] BPMN: Hauptprozess (3 Starts, 2 eingebettete Teilprozesse) und 4 Call-Activity-Teilprozesse (inkl. gemeinsamer Baustein Kundenentscheidung), überarbeitet nach dem Feedback von Prof. Stiehl → [Erklärung, Schwächen, offene Fragen](prozesse/team2/MODELL_ERKLAERUNG.md)
 - [ ] DMN (Berechtigungsregel, Nachversorgungsbedarf, Fristen)
 - [ ] External-Task-Worker, Camel-Routen (JMS, CBR), simulierter Lieferant
 - [ ] Tests und teamübergreifender Beispieldurchlauf

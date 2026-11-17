@@ -1,4 +1,3 @@
-# KI-generiert (Claude, Anthropic). Aufruf: python3 werkzeuge/stilcheck.py prozesse/team2  (benötigt: pip install lxml)
 # Prüft Label-Matching (Stiehl Regeln 10-12, 14, 16, 17) und Camunda-7-Pflichtattribute.
 import glob, sys
 from lxml import etree
