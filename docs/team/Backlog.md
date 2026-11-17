@@ -18,10 +18,10 @@
 
 | Person | Schwerpunkt | Punkte S1+S2 |
 |---|---|---|
-| **Amar** | Messaging und Integration (Camel, ActiveMQ, Lieferant-Simulation) | 21 |
-| **Erion** | Persistenz, REST, Pflege-App-Simulation, Esper | 21 |
+| **Amar** | Messaging, Integration und Eventing (Camel, ActiveMQ, Lieferant-Simulation, Esper) | 26 |
+| **Erion** | Persistenz, REST, Pflege-App-Simulation, bedingter Start | 16 |
 | **Mohammed** | External-Task-Worker, DMN, Deploy auf CIB seven | 21 |
-| **Saifudin** | Benachrichtigung, Testdaten, Doku, Schnittstelle Kundenentscheidung, BPMN | 13 *(bewusst kleiner, weil er BPMN und Doku bis zum Meilenstein 1 allein gemacht hat)* |
+| **Saifudin** | Benachrichtigung, Testdaten, Doku, Schnittstelle Kundenentscheidung, BPMN | 13 *(bewusst am kleinsten, weil er BPMN und Doku bis zum Meilenstein 1 allein gemacht hat)* |
 
 ## Definition of Done (für jede Story)
 - Der Code liegt im Repo und hat den Kommentar `// Verantwortlich: <Name>`. Der KI-Anteil ist mit Beginn, Ende und Werkzeug gekennzeichnet (Projektvorgaben).
@@ -77,7 +77,7 @@
 
 | ID | Story | Akzeptanzkriterien | Pkt | Wer | Sprint |
 |---|---|---|---|---|---|
-| T2-18 | Als **Backoffice** möchte ich aus den Bestandsänderungen eine Verbrauchsprognose erkennen (z. B. Verbrauchssprung), damit keine stille Mengenerhöhung passiert. | Esper-Regel auf Bestandsereignisse · Ergebnis `verbrauchssprung` an den Prozess · Einsatz mit Stiehl abgestimmt (offen) | 5 | Erion | S2 |
+| T2-18 | Als **Backoffice** möchte ich aus den Bestandsänderungen eine Verbrauchsprognose erkennen (z. B. Verbrauchssprung), damit keine stille Mengenerhöhung passiert. | Esper-Regel auf Bestandsereignisse · Ergebnis `verbrauchssprung` an den Prozess · Einsatz mit Stiehl abgestimmt (offen) | 5 | Amar | S2 |
 
 ## Epic E7 – Test, Doku, Integration
 

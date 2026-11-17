@@ -19,15 +19,15 @@
 | Erion | – |
 | Mohammed | – |
 
-**Folge:** Bis zum 14.12. übernehmen **Amar, Erion und Mohammed die großen Code-Pakete** (je 21 Punkte). Saifudin bekommt das kleinste Paket (13 Punkte).
+**Folge:** Bis zum 14.12. übernehmen **Amar und Mohammed die beiden schwersten Pakete**, danach Erion. Reihenfolge nach Schwierigkeit: Amar (26 Punkte), Mohammed (21), Erion (16), Saifudin (13, kleinstes Paket).
 
 ## Verteilung
 Die Aufgaben stehen als User Stories mit Akzeptanzkriterien, Punkten und Sprint im **[Backlog](Backlog.md)**.
 
 | Person | Rolle | Code-Paket (eigener Anteil) | Stories | Punkte |
 |---|---|---|---|---|
-| **Amar** | Integration (Technik) | Messaging und Integration: ActiveMQ, Camel (CBR, XML↔JSON), Lieferant-Simulation, Stubs für Team 3 | T2-14 bis T2-17 | 21 |
-| **Erion** | Technische Umsetzung | Persistenz (JPA/Panache Repository-Stil, MySQL), REST für die Pflege-App-Simulation, bedingter Start, **Esper** | T2-03, 04, 05, 12, 18 | 21 |
+| **Amar** | Integration (Technik) | Messaging, Integration und Eventing: ActiveMQ, Camel (CBR, XML↔JSON), Lieferant-Simulation, Stubs für Team 3, **Esper** | T2-14 bis T2-18 | 26 |
+| **Erion** | Technische Umsetzung | Persistenz (JPA/Panache Repository-Stil, MySQL), REST für die Pflege-App-Simulation, bedingter Start | T2-03, 04, 05, 12 | 16 |
 | **Mohammed** | Prozesslogik | External-Task-Worker, DMN „Nachversorgungsbedarf“ und „Berechtigungsregel“, Deploy auf CIB seven, Projektstruktur | T2-02, 06, 07, 08, 09, 10 | 21 |
 | **Saifudin** | Prozess und Fachlichkeit, Integrationskreis | Benachrichtigungs-Worker, Schnittstelle Kundenentscheidung, Testdaten, Startanleitung, BPMN pflegen | T2-11, 13, 19, 20, 22 | 13 |
 
