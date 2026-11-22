@@ -2,7 +2,7 @@
 
 > **KI-Kennzeichnung:** Vorschlag erstellt mit Claude (Anthropic) auf Basis von Projektvorgaben, Teamauftrag 2, Projekthandbuch (Kap. 9) und Integrationspaket (Kap. 3, Vorlagen A/B). Vom Team zu bestätigen.
 >
-> **Stand:** 17.11.2026 · **Nächster Meilenstein:** 14.12.2026
+> **Stand:** 22.11.2026 · **Nächster Meilenstein:** 14.12.2026
 
 ## Warum so verteilt (Vorgaben von Stiehl)
 - **Prüfungsamt:** Jedes Teammitglied verantwortet einen **eigenen, substanziellen Code-Anteil**. Der **gesamte Code** wird aufgeteilt. Wer welchen Code verantwortet, steht **als Kommentar im Code** (Projektvorgaben A).
@@ -15,9 +15,9 @@
 | Person | Erledigt |
 |---|---|
 | Saifudin | Unterlagen gesammelt, Repo aufgebaut, komplettes BPMN-Modell (5 Dateien), Doku und Modell-Erklärung, Meilenstein-Vorstellung, Umbau nach Stiehls Feedback |
-| Amar | Layout-Skript für die BPMN-Bilder |
-| Erion | – |
-| Mohammed | – |
+| Amar | Layout-Skript für die BPMN-Bilder, Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
+| Erion | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
+| Mohammed | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
 
 **Folge:** Bis zum 14.12. übernehmen **Amar und Mohammed die beiden schwersten Pakete**, danach Erion. Reihenfolge nach Schwierigkeit: Amar (26 Punkte), Mohammed (21), Erion (16), Saifudin (13, kleinstes Paket).
 

@@ -38,6 +38,8 @@ Stiehls Urteil: *„Die Modelle sind in sich weitgehend sauber.“* Was nicht pa
 | 10 | Rollen passen nicht zusammen („Pflege-Backoffice“ vs. „Materialversorgung (Team 2)“). | **Einheitlich „Materialversorgung (Team 2)“** in allen Pools, Lanes „… – automatisiert“ und „… – menschliche Prüfstelle“. | Nein |
 | 11 | Ergebnis von „Abweichungen prüfen“ wird nicht ausgewertet; Name „Erinnerung gesendet“ klingt fachlich. | „Abweichungen prüfen“ **gestrichen**: Die DMN „Berechtigungsregel“ ermittelt die Abweichungen und daraus den Freigabeweg. „Erinnerung gesendet“ gestrichen (siehe Punkt 4). | Nein |
 
+**Abgleich (22.11.2026):** Erion, Mohammed und Amar sind die 11 Punkte von Stiehl durchgegangen und haben das überarbeitete Modell damit verglichen, ob jeder Punkt erfüllt ist.
+
 ## Runde 1: Feedback beim Meilenstein (17.11.2026)
 
 Kernaussage von Stiehl: *Die Pflege-App ist ein eigenständiges System. Mit ihr arbeiten wir über Senden und Empfangen, nicht über Service-Aufgaben.*
