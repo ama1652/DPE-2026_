@@ -1,177 +1,794 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- KI-generiert (Claude, Anthropic) - Beginn. Team 2 Materialversorgung, Pflege-Backoffice MVP, DPE WS 2026/27 (Prof. Stiehl). Verantwortlich im Team: Saifudin Mohammadi (BPMN). Lizenz: MIT. -->
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_T2_Materialversorgung" targetNamespace="http://thi.de/dpe/team2" exporter="Team 2 (KI-unterstützt)" exporterVersion="1.0">
-<bpmn:collaboration id="Collab_T2_Materialversorgung">
-<bpmn:participant id="P_Team3" name="Team 3 - Kommunikation, Fristen, Nachfassen" />
-<bpmn:participant id="P_Lieferant" name="Lieferant (simuliert)" />
-<bpmn:participant id="P_PflegeApp" name="Pflege-App" />
-<bpmn:participant id="P_Materialversorgung" name="Materialversorgung (Team 2)" processRef="T2_Materialversorgung" />
-<bpmn:participant id="P_Team1" name="Team 1 - Verwaltung und Erstattung" />
-<bpmn:messageFlow id="M01" name="Bestandsmeldung" sourceRef="P_PflegeApp" targetRef="Start_Manuell" />
-<bpmn:messageFlow id="M02" name="Freigabe-Anfrage" sourceRef="CA_Bestellfreigabe" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M03" name="Kunden-Entscheidung" sourceRef="P_PflegeApp" targetRef="CA_Bestellfreigabe" />
-<bpmn:messageFlow id="M04" name="Nachfass-Auftrag" sourceRef="CA_Bestellfreigabe" targetRef="P_Team3" />
-<bpmn:messageFlow id="M05" name="Ergebnis" sourceRef="End_NichtZulaessig" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M06" name="Ergebnis" sourceRef="End_NichtFreigegeben" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M07" name="Ergebnis" sourceRef="End_Aufgeschoben" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M08" name="Bestellung" sourceRef="CA_Bestellabwicklung" targetRef="P_Lieferant" />
-<bpmn:messageFlow id="M09" name="Bestell-Antwort" sourceRef="P_Lieferant" targetRef="CA_Bestellabwicklung" />
-<bpmn:messageFlow id="M10" name="Nachfass-Auftrag" sourceRef="CA_Bestellabwicklung" targetRef="P_Team3" />
-<bpmn:messageFlow id="M11" name="Ergebnis" sourceRef="End_KeineBestellung" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M12" name="Versand-Meldung" sourceRef="P_Lieferant" targetRef="CA_Lieferpruefung" />
-<bpmn:messageFlow id="M13" name="Bestätigungs-Anfrage" sourceRef="CA_Lieferpruefung" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M14" name="Liefer-Bestätigung" sourceRef="P_PflegeApp" targetRef="CA_Lieferpruefung" />
-<bpmn:messageFlow id="M15" name="Klärungs-Auftrag" sourceRef="CA_Lieferpruefung" targetRef="P_Team3" />
-<bpmn:messageFlow id="M16" name="Klärungs-Ergebnis" sourceRef="P_Team3" targetRef="CA_Lieferpruefung" />
-<bpmn:messageFlow id="M17" name="Ergebnis" sourceRef="End_Ungeklaert" targetRef="P_PflegeApp" />
-<bpmn:messageFlow id="M18" name="Liefernachweis" sourceRef="SA_Nachweis" targetRef="P_Team1" />
-<bpmn:messageFlow id="M19" name="Ergebnis" sourceRef="SA_Ergebnis" targetRef="P_PflegeApp" />
-</bpmn:collaboration>
-<bpmn:process id="T2_Materialversorgung" name="Materialversorgung" isExecutable="true" camunda:historyTimeToLive="P180D">
-<bpmn:documentation>Hauptprozess Team 2: Verbrauchsprodukte rechtzeitig und kontrolliert nachversorgen (Teamauftrag 2). Eine Instanz = ein Nachversorgungsvorgang für ein Produkt eines Pflegehaushalts (Business Key PH-&lt;Haushalt&gt;:&lt;Produkt&gt;). Den Ist-Bestand führt Team 2 in der eigenen Datenbank. Jedes Ende ohne Lieferung meldet Ergebnis und Reichweitenrisiko an die Pflege-App (Stiehl Punkt 3).</bpmn:documentation>
-<bpmn:startEvent id="Start_Timer" name="Prüftermin erreicht (alle 10 Tage)"><bpmn:documentation>Zyklischer Timer-Start. Er ersetzt jedes eigene Terminieren (Stiehl Punkt 1). Offen (Stiehl): Zuordnung der fälligen Haushalte/Produkte zu den Instanzen.</bpmn:documentation><bpmn:outgoing>F03</bpmn:outgoing><bpmn:timerEventDefinition id="Start_Timer_Def"><bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/P10D</bpmn:timeCycle></bpmn:timerEventDefinition></bpmn:startEvent>
-<bpmn:startEvent id="Start_Manuell" name="Bestand manuell gemeldet"><bpmn:documentation>Die Pflegeperson meldet über die Pflege-App einen abweichenden Ist-Bestand.</bpmn:documentation><bpmn:outgoing>F01</bpmn:outgoing><bpmn:messageEventDefinition id="Start_Manuell_Def" messageRef="Msg_Bestandsmeldung" /></bpmn:startEvent>
-<bpmn:startEvent id="Start_Bedingt" name="Bestand unterschritten"><bpmn:documentation>Bedingter Start auf den Bestand der eigenen Datenbank. CIB seven: nach jeder Bestandsänderung REST "POST /condition" (die Engine überwacht keine Tabellen).</bpmn:documentation><bpmn:outgoing>F02</bpmn:outgoing><bpmn:conditionalEventDefinition id="Start_Bedingt_Def"><bpmn:condition xsi:type="bpmn:tFormalExpression">${bestandMenge &lt; mindestbestand}</bpmn:condition></bpmn:conditionalEventDefinition></bpmn:startEvent>
-<bpmn:exclusiveGateway id="GW_Start" name=""><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('anzahlBestellversuche', 0)}" event="start" /></bpmn:extensionElements><bpmn:incoming>F01</bpmn:incoming><bpmn:incoming>F02</bpmn:incoming><bpmn:incoming>F03</bpmn:incoming><bpmn:outgoing>F04</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:serviceTask id="T_Offen" name="Laufenden Vorgang prüfen" camunda:type="external" camunda:topic="t2-vorgang-pruefen"><bpmn:documentation>Sucht eine laufende Instanz mit gleichem Business Key PH-&lt;Haushalt&gt;:&lt;Produkt&gt; (Stiehl Punkt 2). Ergebnis vorgangOffen (true/false). So kann kein zweiter Durchlauf doppelt bestellen.</bpmn:documentation><bpmn:incoming>F04</bpmn:incoming><bpmn:outgoing>F05</bpmn:outgoing></bpmn:serviceTask>
-<bpmn:exclusiveGateway id="GW_Offen" name="Vorgang bereits offen?"><bpmn:incoming>F05</bpmn:incoming><bpmn:outgoing>F06</bpmn:outgoing><bpmn:outgoing>F07</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:endEvent id="End_Offen" name="Vorgang bereits offen"><bpmn:documentation>Kein zweiter Vorgang; der laufende Vorgang arbeitet mit dem aktuellen Bestand aus der Datenbank.</bpmn:documentation><bpmn:incoming>F06</bpmn:incoming></bpmn:endEvent>
-<bpmn:subProcess id="SP_Bedarf" name="Bedarfsermittlung"><bpmn:documentation>Eingebetteter Teilprozess (wenige Schritte). Er liefert nur Daten (nachversorgungErforderlich); entschieden wird erst am Gateway danach (Stiehl Punkt 8).</bpmn:documentation><bpmn:incoming>F07</bpmn:incoming><bpmn:outgoing>F08</bpmn:outgoing><bpmn:startEvent id="SB_Start" name="Bedarfsprüfung begonnen"><bpmn:outgoing>SF1</bpmn:outgoing></bpmn:startEvent><bpmn:serviceTask id="SB_Reichweite" name="Verbrauch und Reichweite berechnen" camunda:type="external" camunda:topic="t2-reichweite-berechnen"><bpmn:documentation>Liest Ist-Bestand, Verbrauchsannahme und Zielbestand aus der eigenen Datenbank. Setzt verbrauchssprung bei deutlich verändertem Verbrauch.</bpmn:documentation><bpmn:incoming>SF1</bpmn:incoming><bpmn:outgoing>SF2</bpmn:outgoing></bpmn:serviceTask><bpmn:businessRuleTask id="SB_Bedarf" name="Nachversorgungsbedarf feststellen" camunda:type="external" camunda:topic="t2-bedarf-feststellen"><bpmn:documentation>DMN "Nachversorgungsbedarf": Reicht der Bestand bis zum nächsten Prüftermin plus Lieferzeit? Ergebnis nachversorgungErforderlich, nachversorgungsbedarf.</bpmn:documentation><bpmn:incoming>SF2</bpmn:incoming><bpmn:outgoing>SF3</bpmn:outgoing></bpmn:businessRuleTask><bpmn:endEvent id="SB_End" name="Bedarf ermittelt"><bpmn:incoming>SF3</bpmn:incoming></bpmn:endEvent><bpmn:sequenceFlow id="SF1" sourceRef="SB_Start" targetRef="SB_Reichweite"></bpmn:sequenceFlow><bpmn:sequenceFlow id="SF2" sourceRef="SB_Reichweite" targetRef="SB_Bedarf"></bpmn:sequenceFlow><bpmn:sequenceFlow id="SF3" sourceRef="SB_Bedarf" targetRef="SB_End"></bpmn:sequenceFlow></bpmn:subProcess>
-<bpmn:exclusiveGateway id="GW_Bedarf" name="Nachversorgung erforderlich?"><bpmn:documentation>Entscheidet auf den Daten der Bedarfsermittlung (nachversorgungErforderlich).</bpmn:documentation><bpmn:incoming>F08</bpmn:incoming><bpmn:outgoing>F09</bpmn:outgoing><bpmn:outgoing>F10</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:endEvent id="End_Ausreichend" name="Bestand ausreichend"><bpmn:documentation>Kein Handlungsbedarf; der nächste zyklische Timer prüft erneut.</bpmn:documentation><bpmn:incoming>F10</bpmn:incoming></bpmn:endEvent>
-<bpmn:exclusiveGateway id="XOR_BF" name=""><bpmn:incoming>F09</bpmn:incoming><bpmn:incoming>F20</bpmn:incoming><bpmn:outgoing>F11</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:callActivity id="CA_Bestellfreigabe" name="Bestellfreigabe" calledElement="T2_Bestellfreigabe" camunda:calledElementBinding="latest"><bpmn:extensionElements><camunda:in businessKey="#{execution.processBusinessKey}" /><camunda:in source="pflegehaushaltId" target="pflegehaushaltId" /><camunda:in source="vorgangId" target="vorgangId" /><camunda:in source="produktId" target="produktId" /><camunda:in source="nachversorgungsbedarf" target="nachversorgungsbedarf" /><camunda:in source="verbrauchssprung" target="verbrauchssprung" /><camunda:in source="ersatzGrund" target="ersatzGrund" /><camunda:in source="anzahlBestellversuche" target="anzahlBestellversuche" /><camunda:out source="bestellfreigabeErgebnis" target="bestellfreigabeErgebnis" /><camunda:out source="bestellvorschlag" target="bestellvorschlag" /><camunda:out source="ablehnungsgrund" target="ablehnungsgrund" /></bpmn:extensionElements><bpmn:incoming>F11</bpmn:incoming><bpmn:outgoing>F12</bpmn:outgoing></bpmn:callActivity>
-<bpmn:exclusiveGateway id="GW_Freigabe" name="Bestellung freigegeben?"><bpmn:incoming>F12</bpmn:incoming><bpmn:outgoing>F13</bpmn:outgoing><bpmn:outgoing>F14</bpmn:outgoing><bpmn:outgoing>F15</bpmn:outgoing><bpmn:outgoing>F16</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:endEvent id="End_NichtZulaessig" name="Bestellung nicht zulässig"><bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3).</bpmn:documentation><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('vorgangszustand', 'Erfolglos abgeschlossen')}" event="start" /></bpmn:extensionElements><bpmn:incoming>F14</bpmn:incoming><bpmn:messageEventDefinition id="End_NichtZulaessig_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" /></bpmn:endEvent>
-<bpmn:endEvent id="End_NichtFreigegeben" name="Bestellung nicht freigegeben"><bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3).</bpmn:documentation><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('vorgangszustand', 'Erfolglos abgeschlossen')}" event="start" /></bpmn:extensionElements><bpmn:incoming>F15</bpmn:incoming><bpmn:messageEventDefinition id="End_NichtFreigegeben_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" /></bpmn:endEvent>
-<bpmn:endEvent id="End_Aufgeschoben" name="Bestellung aufgeschoben"><bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3). Aufgeschoben ist keine Ablehnung: Reichweitenrisiko sichtbar machen (Teamauftrag 2, Abschnitt 5); der nächste Prüftermin fragt erneut.</bpmn:documentation><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('vorgangszustand', 'Erfolglos abgeschlossen')}" event="start" /></bpmn:extensionElements><bpmn:incoming>F16</bpmn:incoming><bpmn:messageEventDefinition id="End_Aufgeschoben_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" /></bpmn:endEvent>
-<bpmn:callActivity id="CA_Bestellabwicklung" name="Bestellabwicklung" calledElement="T2_Bestellabwicklung" camunda:calledElementBinding="latest"><bpmn:extensionElements><camunda:in businessKey="#{execution.processBusinessKey}" /><camunda:in source="pflegehaushaltId" target="pflegehaushaltId" /><camunda:in source="vorgangId" target="vorgangId" /><camunda:in source="bestellvorschlag" target="bestellvorschlag" /><camunda:in source="anzahlBestellversuche" target="anzahlBestellversuche" /><camunda:out source="bestellabwicklungErgebnis" target="bestellabwicklungErgebnis" /><camunda:out source="bestellung" target="bestellung" /><camunda:out source="ersatzGrund" target="ersatzGrund" /><camunda:executionListener expression="${execution.setVariable('anzahlBestellversuche', anzahlBestellversuche + 1)}" event="start" /></bpmn:extensionElements><bpmn:incoming>F13</bpmn:incoming><bpmn:outgoing>F17</bpmn:outgoing></bpmn:callActivity>
-<bpmn:exclusiveGateway id="GW_Bestellung" name="Bestellung bestätigt?"><bpmn:incoming>F17</bpmn:incoming><bpmn:outgoing>F18</bpmn:outgoing><bpmn:outgoing>F19</bpmn:outgoing><bpmn:outgoing>F20</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:endEvent id="End_KeineBestellung" name="Keine Bestellung möglich"><bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3).</bpmn:documentation><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('vorgangszustand', 'Erfolglos abgeschlossen')}" event="start" /></bpmn:extensionElements><bpmn:incoming>F19</bpmn:incoming><bpmn:messageEventDefinition id="End_KeineBestellung_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" /></bpmn:endEvent>
-<bpmn:callActivity id="CA_Lieferpruefung" name="Lieferprüfung" calledElement="T2_Lieferpruefung" camunda:calledElementBinding="latest"><bpmn:extensionElements><camunda:in businessKey="#{execution.processBusinessKey}" /><camunda:in source="pflegehaushaltId" target="pflegehaushaltId" /><camunda:in source="vorgangId" target="vorgangId" /><camunda:in source="bestellung" target="bestellung" /><camunda:out source="lieferpruefungErgebnis" target="lieferpruefungErgebnis" /><camunda:out source="lieferung" target="lieferung" /></bpmn:extensionElements><bpmn:incoming>F18</bpmn:incoming><bpmn:outgoing>F21</bpmn:outgoing></bpmn:callActivity>
-<bpmn:exclusiveGateway id="GW_Lieferung" name="Lieferung abgeschlossen?"><bpmn:incoming>F21</bpmn:incoming><bpmn:outgoing>F22</bpmn:outgoing><bpmn:outgoing>F23</bpmn:outgoing></bpmn:exclusiveGateway>
-<bpmn:endEvent id="End_Ungeklaert" name="Lieferung ungeklärt"><bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3). Der Fall ist an die menschliche Prüfstelle übergeben.</bpmn:documentation><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('vorgangszustand', 'Übergeben')}" event="start" /></bpmn:extensionElements><bpmn:incoming>F23</bpmn:incoming><bpmn:messageEventDefinition id="End_Ungeklaert_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" /></bpmn:endEvent>
-<bpmn:subProcess id="SP_Abschluss" name="Vorgangsabschluss"><bpmn:documentation>Eingebetteter Teilprozess zu Schritt 11 und 12.</bpmn:documentation><bpmn:incoming>F22</bpmn:incoming><bpmn:outgoing>F24</bpmn:outgoing><bpmn:startEvent id="SA_Start" name="Abschluss begonnen"><bpmn:outgoing>AF1</bpmn:outgoing></bpmn:startEvent><bpmn:serviceTask id="SA_Fortschreiben" name="Bestand und Verbrauch fortschreiben" camunda:type="external" camunda:topic="t2-bestand-fortschreiben"><bpmn:documentation>Neuer Ist-Bestand und neue Reichweite in der eigenen Datenbank.</bpmn:documentation><bpmn:incoming>AF1</bpmn:incoming><bpmn:outgoing>AF2</bpmn:outgoing></bpmn:serviceTask><bpmn:sendTask id="SA_Nachweis" name="Liefernachweis übergeben" camunda:type="external" camunda:topic="t2-nachweis-uebergeben"><bpmn:documentation>An Team 1. Schnittstelle = Vorschlag zur Abstimmung.</bpmn:documentation><bpmn:incoming>AF2</bpmn:incoming><bpmn:outgoing>AF3</bpmn:outgoing></bpmn:sendTask><bpmn:sendTask id="SA_Ergebnis" name="Ergebnis mitteilen" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen"><bpmn:documentation>Nachricht an die Pflege-App: Lieferung abgeschlossen, neuer Bestand.</bpmn:documentation><bpmn:incoming>AF3</bpmn:incoming><bpmn:outgoing>AF4</bpmn:outgoing></bpmn:sendTask><bpmn:endEvent id="SA_End" name="Vorgang geschlossen"><bpmn:incoming>AF4</bpmn:incoming></bpmn:endEvent><bpmn:sequenceFlow id="AF1" sourceRef="SA_Start" targetRef="SA_Fortschreiben"></bpmn:sequenceFlow><bpmn:sequenceFlow id="AF2" sourceRef="SA_Fortschreiben" targetRef="SA_Nachweis"></bpmn:sequenceFlow><bpmn:sequenceFlow id="AF3" sourceRef="SA_Nachweis" targetRef="SA_Ergebnis"></bpmn:sequenceFlow><bpmn:sequenceFlow id="AF4" sourceRef="SA_Ergebnis" targetRef="SA_End"></bpmn:sequenceFlow></bpmn:subProcess>
-<bpmn:endEvent id="End_Abgeschlossen" name="Nachversorgung abgeschlossen"><bpmn:extensionElements><camunda:executionListener expression="${execution.setVariable('vorgangszustand', 'Erfolgreich abgeschlossen')}" event="start" /></bpmn:extensionElements><bpmn:incoming>F24</bpmn:incoming></bpmn:endEvent>
-<bpmn:sequenceFlow id="F01" sourceRef="Start_Manuell" targetRef="GW_Start"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F02" sourceRef="Start_Bedingt" targetRef="GW_Start"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F03" sourceRef="Start_Timer" targetRef="GW_Start"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F04" sourceRef="GW_Start" targetRef="T_Offen"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F05" sourceRef="T_Offen" targetRef="GW_Offen"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F06" sourceRef="GW_Offen" targetRef="End_Offen" name="Ja"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${vorgangOffen}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F07" sourceRef="GW_Offen" targetRef="SP_Bedarf" name="Nein"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!vorgangOffen}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F08" sourceRef="SP_Bedarf" targetRef="GW_Bedarf"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F09" sourceRef="GW_Bedarf" targetRef="XOR_BF" name="Ja"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nachversorgungErforderlich}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F10" sourceRef="GW_Bedarf" targetRef="End_Ausreichend" name="Nein"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!nachversorgungErforderlich}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F11" sourceRef="XOR_BF" targetRef="CA_Bestellfreigabe"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F12" sourceRef="CA_Bestellfreigabe" targetRef="GW_Freigabe"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F13" sourceRef="GW_Freigabe" targetRef="CA_Bestellabwicklung" name="Bestellung freigegeben"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung freigegeben'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F14" sourceRef="GW_Freigabe" targetRef="End_NichtZulaessig" name="Bestellung nicht zulässig"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung nicht zulässig'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F15" sourceRef="GW_Freigabe" targetRef="End_NichtFreigegeben" name="Bestellung nicht freigegeben"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung nicht freigegeben'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F16" sourceRef="GW_Freigabe" targetRef="End_Aufgeschoben" name="Bestellung aufgeschoben"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung aufgeschoben'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F17" sourceRef="CA_Bestellabwicklung" targetRef="GW_Bestellung"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F18" sourceRef="GW_Bestellung" targetRef="CA_Lieferpruefung" name="Bestellung bestätigt"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellabwicklungErgebnis == 'Bestellung bestätigt'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F19" sourceRef="GW_Bestellung" targetRef="End_KeineBestellung" name="Keine Bestellung möglich"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellabwicklungErgebnis == 'Keine Bestellung möglich'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F20" sourceRef="GW_Bestellung" targetRef="XOR_BF" name="Ersatz erforderlich"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellabwicklungErgebnis == 'Ersatz erforderlich'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F21" sourceRef="CA_Lieferpruefung" targetRef="GW_Lieferung"></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F22" sourceRef="GW_Lieferung" targetRef="SP_Abschluss" name="Lieferung abgeschlossen"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lieferpruefungErgebnis == 'Lieferung abgeschlossen'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F23" sourceRef="GW_Lieferung" targetRef="End_Ungeklaert" name="Lieferung ungeklärt"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lieferpruefungErgebnis == 'Lieferung ungeklärt'}</bpmn:conditionExpression></bpmn:sequenceFlow>
-<bpmn:sequenceFlow id="F24" sourceRef="SP_Abschluss" targetRef="End_Abgeschlossen"></bpmn:sequenceFlow>
-<bpmn:textAnnotation id="A_Ersatz"><bpmn:text>Rückgabe an die Bestellfreigabe: ersatzGrund und anzahlBestellversuche. Die Obergrenze prüft die Bestellabwicklung ("Ersatzoption prüfen").</bpmn:text></bpmn:textAnnotation>
-<bpmn:association id="A_Ersatz_Assoc" associationDirection="None" sourceRef="F20" targetRef="A_Ersatz" />
-</bpmn:process>
-<bpmn:message id="Msg_Bestandsmeldung" name="PflegeApp_Bestandsmeldung_Team2" />
-<bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collab_T2_Materialversorgung">
-<bpmndi:BPMNShape id="P_Team3_di" bpmnElement="P_Team3" isHorizontal="true"><dc:Bounds x="120" y="10" width="3980" height="50" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="P_Lieferant_di" bpmnElement="P_Lieferant" isHorizontal="true"><dc:Bounds x="120" y="70" width="3980" height="50" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="P_PflegeApp_di" bpmnElement="P_PflegeApp" isHorizontal="true"><dc:Bounds x="120" y="130" width="3980" height="50" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="P_Materialversorgung_di" bpmnElement="P_Materialversorgung" isHorizontal="true"><dc:Bounds x="120" y="200" width="3980" height="520" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="P_Team1_di" bpmnElement="P_Team1" isHorizontal="true"><dc:Bounds x="120" y="760" width="3980" height="60" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="Start_Timer_di" bpmnElement="Start_Timer"><dc:Bounds x="182" y="592" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="150" y="632" width="100" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="Start_Manuell_di" bpmnElement="Start_Manuell" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="272" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="245" y="482" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="Start_Bedingt_di" bpmnElement="Start_Bedingt"><dc:Bounds x="362" y="312" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="335" y="280" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="GW_Start_di" bpmnElement="GW_Start" isMarkerVisible="true"><dc:Bounds x="355" y="435" width="50" height="50" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="T_Offen_di" bpmnElement="T_Offen"><dc:Bounds x="430" y="420" width="140" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="GW_Offen_di" bpmnElement="GW_Offen" isMarkerVisible="true"><dc:Bounds x="595" y="435" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="580" y="489" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_Offen_di" bpmnElement="End_Offen"><dc:Bounds x="602" y="312" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="644" y="316" width="110" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SP_Bedarf_di" bpmnElement="SP_Bedarf" isExpanded="true"><dc:Bounds x="700" y="380" width="480" height="160" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SB_Start_di" bpmnElement="SB_Start"><dc:Bounds x="720" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="698" y="482" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SB_Reichweite_di" bpmnElement="SB_Reichweite"><dc:Bounds x="795" y="420" width="140" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SB_Bedarf_di" bpmnElement="SB_Bedarf"><dc:Bounds x="945" y="420" width="150" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SB_End_di" bpmnElement="SB_End"><dc:Bounds x="1122" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1105" y="482" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="GW_Bedarf_di" bpmnElement="GW_Bedarf" isMarkerVisible="true"><dc:Bounds x="1225" y="435" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1210" y="393" width="80" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_Ausreichend_di" bpmnElement="End_Ausreichend"><dc:Bounds x="1232" y="582" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1160" y="590" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="XOR_BF_di" bpmnElement="XOR_BF" isMarkerVisible="true"><dc:Bounds x="1305" y="435" width="50" height="50" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="CA_Bestellfreigabe_di" bpmnElement="CA_Bestellfreigabe"><dc:Bounds x="1370" y="420" width="320" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="GW_Freigabe_di" bpmnElement="GW_Freigabe" isMarkerVisible="true"><dc:Bounds x="1805" y="435" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1750" y="484" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_NichtZulaessig_di" bpmnElement="End_NichtZulaessig" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="1722" y="322" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1628" y="330" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_NichtFreigegeben_di" bpmnElement="End_NichtFreigegeben" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="1812" y="282" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1746" y="232" width="100" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_Aufgeschoben_di" bpmnElement="End_Aufgeschoben" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="1902" y="322" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1942" y="330" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="CA_Bestellabwicklung_di" bpmnElement="CA_Bestellabwicklung"><dc:Bounds x="2040" y="420" width="320" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="GW_Bestellung_di" bpmnElement="GW_Bestellung" isMarkerVisible="true"><dc:Bounds x="2425" y="435" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2370" y="484" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_KeineBestellung_di" bpmnElement="End_KeineBestellung" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="2432" y="312" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2472" y="320" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="CA_Lieferpruefung_di" bpmnElement="CA_Lieferpruefung"><dc:Bounds x="2580" y="420" width="560" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="GW_Lieferung_di" bpmnElement="GW_Lieferung" isMarkerVisible="true"><dc:Bounds x="3195" y="435" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="3140" y="484" width="70" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_Ungeklaert_di" bpmnElement="End_Ungeklaert" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="3202" y="312" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3242" y="320" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SP_Abschluss_di" bpmnElement="SP_Abschluss" isExpanded="true"><dc:Bounds x="3330" y="360" width="650" height="200" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SA_Start_di" bpmnElement="SA_Start"><dc:Bounds x="3362" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3340" y="482" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SA_Fortschreiben_di" bpmnElement="SA_Fortschreiben"><dc:Bounds x="3420" y="420" width="140" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SA_Nachweis_di" bpmnElement="SA_Nachweis" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="3580" y="420" width="140" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SA_Ergebnis_di" bpmnElement="SA_Ergebnis" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="3740" y="420" width="140" height="80" /></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="SA_End_di" bpmnElement="SA_End"><dc:Bounds x="3912" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3890" y="482" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="End_Abgeschlossen_di" bpmnElement="End_Abgeschlossen"><dc:Bounds x="4022" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3995" y="482" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="A_Ersatz_di" bpmnElement="A_Ersatz"><dc:Bounds x="1700" y="575" width="320" height="40" /></bpmndi:BPMNShape>
-<bpmndi:BPMNEdge id="A_Ersatz_Assoc_di" bpmnElement="A_Ersatz_Assoc"><di:waypoint x="1860" y="650" /><di:waypoint x="1860" y="615" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F01_di" bpmnElement="F01"><di:waypoint x="308" y="460" /><di:waypoint x="355" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F02_di" bpmnElement="F02"><di:waypoint x="380" y="348" /><di:waypoint x="380" y="435" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F03_di" bpmnElement="F03"><di:waypoint x="218" y="610" /><di:waypoint x="380" y="610" /><di:waypoint x="380" y="485" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F04_di" bpmnElement="F04"><di:waypoint x="405" y="460" /><di:waypoint x="430" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F05_di" bpmnElement="F05"><di:waypoint x="570" y="460" /><di:waypoint x="595" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F06_di" bpmnElement="F06"><di:waypoint x="620" y="435" /><di:waypoint x="620" y="348" /><bpmndi:BPMNLabel><dc:Bounds x="626" y="380" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F07_di" bpmnElement="F07"><di:waypoint x="645" y="460" /><di:waypoint x="700" y="460" /><bpmndi:BPMNLabel><dc:Bounds x="648" y="440" width="34" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="SF1_di" bpmnElement="SF1"><di:waypoint x="756" y="460" /><di:waypoint x="795" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="SF2_di" bpmnElement="SF2"><di:waypoint x="935" y="460" /><di:waypoint x="945" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="SF3_di" bpmnElement="SF3"><di:waypoint x="1095" y="460" /><di:waypoint x="1122" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F08_di" bpmnElement="F08"><di:waypoint x="1180" y="460" /><di:waypoint x="1225" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F09_di" bpmnElement="F09"><di:waypoint x="1275" y="460" /><di:waypoint x="1305" y="460" /><bpmndi:BPMNLabel><dc:Bounds x="1276" y="440" width="30" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F10_di" bpmnElement="F10"><di:waypoint x="1250" y="485" /><di:waypoint x="1250" y="582" /><bpmndi:BPMNLabel><dc:Bounds x="1256" y="510" width="34" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F11_di" bpmnElement="F11"><di:waypoint x="1355" y="460" /><di:waypoint x="1370" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F12_di" bpmnElement="F12"><di:waypoint x="1690" y="460" /><di:waypoint x="1805" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F13_di" bpmnElement="F13"><di:waypoint x="1855" y="460" /><di:waypoint x="2040" y="460" /><bpmndi:BPMNLabel><dc:Bounds x="1860" y="468" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F14_di" bpmnElement="F14"><di:waypoint x="1819" y="446" /><di:waypoint x="1740" y="446" /><di:waypoint x="1740" y="358" /><bpmndi:BPMNLabel><dc:Bounds x="1648" y="380" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F15_di" bpmnElement="F15"><di:waypoint x="1830" y="435" /><di:waypoint x="1830" y="318" /><bpmndi:BPMNLabel><dc:Bounds x="1836" y="350" width="70" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F16_di" bpmnElement="F16"><di:waypoint x="1841" y="446" /><di:waypoint x="1920" y="446" /><di:waypoint x="1920" y="358" /><bpmndi:BPMNLabel><dc:Bounds x="1926" y="380" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F17_di" bpmnElement="F17"><di:waypoint x="2360" y="460" /><di:waypoint x="2425" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F18_di" bpmnElement="F18"><di:waypoint x="2475" y="460" /><di:waypoint x="2580" y="460" /><bpmndi:BPMNLabel><dc:Bounds x="2478" y="468" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F19_di" bpmnElement="F19"><di:waypoint x="2450" y="435" /><di:waypoint x="2450" y="348" /><bpmndi:BPMNLabel><dc:Bounds x="2456" y="376" width="70" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F20_di" bpmnElement="F20"><di:waypoint x="2450" y="485" /><di:waypoint x="2450" y="650" /><di:waypoint x="1330" y="650" /><di:waypoint x="1330" y="485" /><bpmndi:BPMNLabel><dc:Bounds x="2456" y="560" width="64" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F21_di" bpmnElement="F21"><di:waypoint x="3140" y="460" /><di:waypoint x="3195" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F22_di" bpmnElement="F22"><di:waypoint x="3245" y="460" /><di:waypoint x="3330" y="460" /><bpmndi:BPMNLabel><dc:Bounds x="3262" y="426" width="56" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F23_di" bpmnElement="F23"><di:waypoint x="3220" y="435" /><di:waypoint x="3220" y="348" /><bpmndi:BPMNLabel><dc:Bounds x="3226" y="376" width="60" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="AF1_di" bpmnElement="AF1"><di:waypoint x="3398" y="460" /><di:waypoint x="3420" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="AF2_di" bpmnElement="AF2"><di:waypoint x="3560" y="460" /><di:waypoint x="3580" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="AF3_di" bpmnElement="AF3"><di:waypoint x="3720" y="460" /><di:waypoint x="3740" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="AF4_di" bpmnElement="AF4"><di:waypoint x="3880" y="460" /><di:waypoint x="3912" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="F24_di" bpmnElement="F24"><di:waypoint x="3980" y="460" /><di:waypoint x="4022" y="460" /></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M01_di" bpmnElement="M01"><di:waypoint x="290" y="180" /><di:waypoint x="290" y="442" /><bpmndi:BPMNLabel><dc:Bounds x="210" y="380" width="70" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M02_di" bpmnElement="M02"><di:waypoint x="1410" y="420" /><di:waypoint x="1410" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="1414" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M03_di" bpmnElement="M03"><di:waypoint x="1530" y="180" /><di:waypoint x="1530" y="420" /><bpmndi:BPMNLabel><dc:Bounds x="1534" y="245" width="110" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M04_di" bpmnElement="M04"><di:waypoint x="1650" y="420" /><di:waypoint x="1650" y="60" /><bpmndi:BPMNLabel><dc:Bounds x="1654" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M05_di" bpmnElement="M05"><di:waypoint x="1740" y="322" /><di:waypoint x="1740" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="1744" y="196" width="48" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M06_di" bpmnElement="M06"><di:waypoint x="1830" y="282" /><di:waypoint x="1830" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="1834" y="196" width="48" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M07_di" bpmnElement="M07"><di:waypoint x="1920" y="322" /><di:waypoint x="1920" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="1924" y="196" width="48" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M08_di" bpmnElement="M08"><di:waypoint x="2080" y="420" /><di:waypoint x="2080" y="120" /><bpmndi:BPMNLabel><dc:Bounds x="2084" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M09_di" bpmnElement="M09"><di:waypoint x="2200" y="120" /><di:waypoint x="2200" y="420" /><bpmndi:BPMNLabel><dc:Bounds x="2204" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M10_di" bpmnElement="M10"><di:waypoint x="2320" y="420" /><di:waypoint x="2320" y="60" /><bpmndi:BPMNLabel><dc:Bounds x="2324" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M11_di" bpmnElement="M11"><di:waypoint x="2450" y="312" /><di:waypoint x="2450" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="2454" y="196" width="48" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M12_di" bpmnElement="M12"><di:waypoint x="2620" y="120" /><di:waypoint x="2620" y="420" /><bpmndi:BPMNLabel><dc:Bounds x="2624" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M13_di" bpmnElement="M13"><di:waypoint x="2740" y="420" /><di:waypoint x="2740" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="2744" y="245" width="110" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M14_di" bpmnElement="M14"><di:waypoint x="2860" y="180" /><di:waypoint x="2860" y="420" /><bpmndi:BPMNLabel><dc:Bounds x="2864" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M15_di" bpmnElement="M15"><di:waypoint x="2980" y="420" /><di:waypoint x="2980" y="60" /><bpmndi:BPMNLabel><dc:Bounds x="2984" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M16_di" bpmnElement="M16"><di:waypoint x="3100" y="60" /><di:waypoint x="3100" y="420" /><bpmndi:BPMNLabel><dc:Bounds x="3104" y="245" width="110" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M17_di" bpmnElement="M17"><di:waypoint x="3220" y="312" /><di:waypoint x="3220" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="3224" y="196" width="48" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M18_di" bpmnElement="M18"><di:waypoint x="3650" y="500" /><di:waypoint x="3650" y="760" /><bpmndi:BPMNLabel><dc:Bounds x="3656" y="730" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-<bpmndi:BPMNEdge id="M19_di" bpmnElement="M19"><di:waypoint x="3810" y="420" /><di:waypoint x="3810" y="180" /><bpmndi:BPMNLabel><dc:Bounds x="3814" y="245" width="48" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-</bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_T2_Materialversorgung" targetNamespace="http://thi.de/dpe/team2" exporter="Camunda Modeler" exporterVersion="5.52.0">
+  <bpmn:collaboration id="Collab_T2_Materialversorgung">
+    <bpmn:participant id="P_Team3" name="Team 3 - Kommunikation, Fristen, Nachfassen" />
+    <bpmn:participant id="P_Lieferant" name="Lieferant (simuliert)" />
+    <bpmn:participant id="P_PflegeApp" name="Pflege-App" />
+    <bpmn:participant id="P_Materialversorgung" name="Materialversorgung (Team 2)" processRef="T2_Materialversorgung" />
+    <bpmn:participant id="P_Team1" name="Team 1 - Verwaltung und Erstattung" />
+    <bpmn:messageFlow id="M01" name="Bestandsmeldung" sourceRef="P_PflegeApp" targetRef="Start_Manuell" />
+    <bpmn:messageFlow id="M02" name="Freigabe-Anfrage" sourceRef="CA_Bestellfreigabe" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M03" name="Kunden-Entscheidung" sourceRef="P_PflegeApp" targetRef="CA_Bestellfreigabe" />
+    <bpmn:messageFlow id="M04" name="Nachfass-Auftrag" sourceRef="CA_Bestellfreigabe" targetRef="P_Team3" />
+    <bpmn:messageFlow id="M05" name="Ergebnis" sourceRef="End_NichtZulaessig" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M07" name="Ergebnis" sourceRef="End_Aufgeschoben" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M08" name="Bestellung" sourceRef="CA_Bestellabwicklung" targetRef="P_Lieferant" />
+    <bpmn:messageFlow id="M09" name="Bestell-Antwort" sourceRef="P_Lieferant" targetRef="CA_Bestellabwicklung" />
+    <bpmn:messageFlow id="M10" name="Nachfass-Auftrag" sourceRef="CA_Bestellabwicklung" targetRef="P_Team3" />
+    <bpmn:messageFlow id="M11" name="Ergebnis" sourceRef="End_KeineBestellung" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M12" name="Versand-Meldung" sourceRef="P_Lieferant" targetRef="CA_Lieferpruefung" />
+    <bpmn:messageFlow id="M13" name="Bestätigungs-Anfrage" sourceRef="CA_Lieferpruefung" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M14" name="Liefer-Bestätigung" sourceRef="P_PflegeApp" targetRef="CA_Lieferpruefung" />
+    <bpmn:messageFlow id="M15" name="Klärungs-Auftrag" sourceRef="CA_Lieferpruefung" targetRef="P_Team3" />
+    <bpmn:messageFlow id="M16" name="Klärungs-Ergebnis" sourceRef="P_Team3" targetRef="CA_Lieferpruefung" />
+    <bpmn:messageFlow id="M17" name="Ergebnis" sourceRef="End_Ungeklaert" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M18" name="Liefernachweis" sourceRef="SA_Nachweis" targetRef="P_Team1" />
+    <bpmn:messageFlow id="M19" name="Ergebnis" sourceRef="SA_Ergebnis" targetRef="P_PflegeApp" />
+    <bpmn:messageFlow id="M06" name="Ergebnis" sourceRef="End_NichtFreigegeben" targetRef="P_PflegeApp" />
+    <bpmn:textAnnotation id="A_Ersatz">
+      <bpmn:text>Rückgabe an die Bestellfreigabe: ersatzGrund und anzahlBestellversuche. Die Obergrenze prüft die Bestellabwicklung ("Ersatzoption prüfen").</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="A_Ersatz_Assoc" associationDirection="None" sourceRef="F20" targetRef="A_Ersatz" />
+  </bpmn:collaboration>
+  <bpmn:process id="T2_Materialversorgung" name="Materialversorgung" isExecutable="true" camunda:historyTimeToLive="P180D">
+    <bpmn:documentation>Hauptprozess Team 2: Verbrauchsprodukte rechtzeitig und kontrolliert nachversorgen (Teamauftrag 2). Eine Instanz = ein Nachversorgungsvorgang für ein Produkt eines Pflegehaushalts (Business Key PH-&lt;Haushalt&gt;:&lt;Produkt&gt;). Den Ist-Bestand führt Team 2 in der eigenen Datenbank. Jedes Ende ohne Lieferung meldet Ergebnis und Reichweitenrisiko an die Pflege-App (Stiehl Punkt 3).</bpmn:documentation>
+    <bpmn:startEvent id="Start_Timer" name="Prüftermin erreicht (alle 10 Tage)">
+      <bpmn:documentation>Zyklischer Timer-Start. Er ersetzt jedes eigene Terminieren (Stiehl Punkt 1). Offen (Stiehl): Zuordnung der fälligen Haushalte/Produkte zu den Instanzen.</bpmn:documentation>
+      <bpmn:outgoing>F03</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Start_Timer_Def">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/P10D</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:startEvent id="Start_Manuell" name="Bestand manuell gemeldet">
+      <bpmn:documentation>Die Pflegeperson meldet über die Pflege-App einen abweichenden Ist-Bestand.</bpmn:documentation>
+      <bpmn:outgoing>F01</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Start_Manuell_Def" messageRef="Msg_Bestandsmeldung" />
+    </bpmn:startEvent>
+    <bpmn:startEvent id="Start_Bedingt" name="Bestand unterschritten">
+      <bpmn:documentation>Bedingter Start auf den Bestand der eigenen Datenbank. CIB seven: nach jeder Bestandsänderung REST "POST /condition" (die Engine überwacht keine Tabellen).</bpmn:documentation>
+      <bpmn:outgoing>F02</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition id="Start_Bedingt_Def">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${bestandMenge &lt; mindestbestand}</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="GW_Start" name="">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;anzahlBestellversuche&#39;, 0)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F01</bpmn:incoming>
+      <bpmn:incoming>F02</bpmn:incoming>
+      <bpmn:incoming>F03</bpmn:incoming>
+      <bpmn:outgoing>F04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T_Offen" name="Laufenden Vorgang prüfen" camunda:type="external" camunda:topic="t2-vorgang-pruefen">
+      <bpmn:documentation>Sucht eine laufende Instanz mit gleichem Business Key PH-&lt;Haushalt&gt;:&lt;Produkt&gt; (Stiehl Punkt 2). Ergebnis vorgangOffen (true/false). So kann kein zweiter Durchlauf doppelt bestellen.</bpmn:documentation>
+      <bpmn:incoming>F04</bpmn:incoming>
+      <bpmn:outgoing>F05</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="GW_Offen" name="Vorgang bereits offen?">
+      <bpmn:incoming>F05</bpmn:incoming>
+      <bpmn:outgoing>F06</bpmn:outgoing>
+      <bpmn:outgoing>F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_Offen" name="Vorgang bereits offen">
+      <bpmn:documentation>Kein zweiter Vorgang; der laufende Vorgang arbeitet mit dem aktuellen Bestand aus der Datenbank.</bpmn:documentation>
+      <bpmn:incoming>F06</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SP_Bedarf" name="Bedarfsermittlung">
+      <bpmn:documentation>Eingebetteter Teilprozess (wenige Schritte). Er liefert nur Daten (nachversorgungErforderlich); entschieden wird erst am Gateway danach (Stiehl Punkt 8).</bpmn:documentation>
+      <bpmn:incoming>F07</bpmn:incoming>
+      <bpmn:outgoing>F08</bpmn:outgoing>
+      <bpmn:startEvent id="SB_Start" name="Bedarfsprüfung begonnen">
+        <bpmn:outgoing>SF1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="SB_Reichweite" name="Verbrauch und Reichweite berechnen" camunda:type="external" camunda:topic="t2-reichweite-berechnen">
+        <bpmn:documentation>Liest Ist-Bestand, Verbrauchsannahme und Zielbestand aus der eigenen Datenbank. Setzt verbrauchssprung bei deutlich verändertem Verbrauch.</bpmn:documentation>
+        <bpmn:incoming>SF1</bpmn:incoming>
+        <bpmn:outgoing>SF2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:businessRuleTask id="SB_Bedarf" name="Nachversorgungsbedarf feststellen" camunda:type="external" camunda:topic="t2-bedarf-feststellen">
+        <bpmn:documentation>DMN "Nachversorgungsbedarf": Reicht der Bestand bis zum nächsten Prüftermin plus Lieferzeit? Ergebnis nachversorgungErforderlich, nachversorgungsbedarf.</bpmn:documentation>
+        <bpmn:incoming>SF2</bpmn:incoming>
+        <bpmn:outgoing>SF3</bpmn:outgoing>
+      </bpmn:businessRuleTask>
+      <bpmn:endEvent id="SB_End" name="Bedarf ermittelt">
+        <bpmn:incoming>SF3</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SF1" sourceRef="SB_Start" targetRef="SB_Reichweite" />
+      <bpmn:sequenceFlow id="SF2" sourceRef="SB_Reichweite" targetRef="SB_Bedarf" />
+      <bpmn:sequenceFlow id="SF3" sourceRef="SB_Bedarf" targetRef="SB_End" />
+    </bpmn:subProcess>
+    <bpmn:exclusiveGateway id="GW_Bedarf" name="Nachversorgung erforderlich?">
+      <bpmn:documentation>Entscheidet auf den Daten der Bedarfsermittlung (nachversorgungErforderlich).</bpmn:documentation>
+      <bpmn:incoming>F08</bpmn:incoming>
+      <bpmn:outgoing>F09</bpmn:outgoing>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_Ausreichend" name="Bestand ausreichend">
+      <bpmn:documentation>Kein Handlungsbedarf; der nächste zyklische Timer prüft erneut.</bpmn:documentation>
+      <bpmn:incoming>F10</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="XOR_BF" name="">
+      <bpmn:incoming>F09</bpmn:incoming>
+      <bpmn:incoming>F20</bpmn:incoming>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="CA_Bestellfreigabe" name="Bestellfreigabe" calledElement="T2_Bestellfreigabe">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in source="pflegehaushaltId" target="pflegehaushaltId" />
+        <camunda:in source="vorgangId" target="vorgangId" />
+        <camunda:in source="produktId" target="produktId" />
+        <camunda:in source="nachversorgungsbedarf" target="nachversorgungsbedarf" />
+        <camunda:in source="verbrauchssprung" target="verbrauchssprung" />
+        <camunda:in source="ersatzGrund" target="ersatzGrund" />
+        <camunda:in source="anzahlBestellversuche" target="anzahlBestellversuche" />
+        <camunda:out source="bestellfreigabeErgebnis" target="bestellfreigabeErgebnis" />
+        <camunda:out source="bestellvorschlag" target="bestellvorschlag" />
+        <camunda:out source="ablehnungsgrund" target="ablehnungsgrund" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="GW_Freigabe" name="Bestellung freigegeben?">
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+      <bpmn:outgoing>F16</bpmn:outgoing>
+      <bpmn:outgoing>F15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_NichtZulaessig" name="Bestellung nicht zulässig">
+      <bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3).</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;vorgangszustand&#39;, &#39;Erfolglos abgeschlossen&#39;)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F14</bpmn:incoming>
+      <bpmn:messageEventDefinition id="End_NichtZulaessig_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_Aufgeschoben" name="Bestellung aufgeschoben">
+      <bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3). Aufgeschoben ist keine Ablehnung: Reichweitenrisiko sichtbar machen (Teamauftrag 2, Abschnitt 5); der nächste Prüftermin fragt erneut.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;vorgangszustand&#39;, &#39;Erfolglos abgeschlossen&#39;)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F16</bpmn:incoming>
+      <bpmn:messageEventDefinition id="End_Aufgeschoben_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" />
+    </bpmn:endEvent>
+    <bpmn:callActivity id="CA_Bestellabwicklung" name="Bestellabwicklung" calledElement="T2_Bestellabwicklung">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in source="pflegehaushaltId" target="pflegehaushaltId" />
+        <camunda:in source="vorgangId" target="vorgangId" />
+        <camunda:in source="bestellvorschlag" target="bestellvorschlag" />
+        <camunda:in source="anzahlBestellversuche" target="anzahlBestellversuche" />
+        <camunda:out source="bestellabwicklungErgebnis" target="bestellabwicklungErgebnis" />
+        <camunda:out source="bestellung" target="bestellung" />
+        <camunda:out source="ersatzGrund" target="ersatzGrund" />
+        <camunda:executionListener expression="${execution.setVariable(&#39;anzahlBestellversuche&#39;, anzahlBestellversuche + 1)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:outgoing>F17</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="GW_Bestellung" name="Bestellung bestätigt?">
+      <bpmn:incoming>F17</bpmn:incoming>
+      <bpmn:outgoing>F18</bpmn:outgoing>
+      <bpmn:outgoing>F19</bpmn:outgoing>
+      <bpmn:outgoing>F20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_KeineBestellung" name="Keine Bestellung möglich">
+      <bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3).</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;vorgangszustand&#39;, &#39;Erfolglos abgeschlossen&#39;)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F19</bpmn:incoming>
+      <bpmn:messageEventDefinition id="End_KeineBestellung_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" />
+    </bpmn:endEvent>
+    <bpmn:callActivity id="CA_Lieferpruefung" name="Lieferprüfung" calledElement="T2_Lieferpruefung">
+      <bpmn:extensionElements>
+        <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:in source="pflegehaushaltId" target="pflegehaushaltId" />
+        <camunda:in source="vorgangId" target="vorgangId" />
+        <camunda:in source="bestellung" target="bestellung" />
+        <camunda:out source="lieferpruefungErgebnis" target="lieferpruefungErgebnis" />
+        <camunda:out source="lieferung" target="lieferung" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F18</bpmn:incoming>
+      <bpmn:outgoing>F21</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="GW_Lieferung" name="Lieferung abgeschlossen?">
+      <bpmn:incoming>F21</bpmn:incoming>
+      <bpmn:outgoing>F22</bpmn:outgoing>
+      <bpmn:outgoing>F23</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_Ungeklaert" name="Lieferung ungeklärt">
+      <bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3). Der Fall ist an die menschliche Prüfstelle übergeben.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;vorgangszustand&#39;, &#39;Übergeben&#39;)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F23</bpmn:incoming>
+      <bpmn:messageEventDefinition id="End_Ungeklaert_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" />
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SP_Abschluss" name="Vorgangsabschluss">
+      <bpmn:documentation>Eingebetteter Teilprozess zu Schritt 11 und 12.</bpmn:documentation>
+      <bpmn:incoming>F22</bpmn:incoming>
+      <bpmn:outgoing>F24</bpmn:outgoing>
+      <bpmn:startEvent id="SA_Start" name="Abschluss begonnen">
+        <bpmn:outgoing>AF1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="SA_Fortschreiben" name="Bestand und Verbrauch fortschreiben" camunda:type="external" camunda:topic="t2-bestand-fortschreiben">
+        <bpmn:documentation>Neuer Ist-Bestand und neue Reichweite in der eigenen Datenbank.</bpmn:documentation>
+        <bpmn:incoming>AF1</bpmn:incoming>
+        <bpmn:outgoing>AF2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sendTask id="SA_Nachweis" name="Liefernachweis übergeben" camunda:type="external" camunda:topic="t2-nachweis-uebergeben">
+        <bpmn:documentation>An Team 1. Schnittstelle = Vorschlag zur Abstimmung.</bpmn:documentation>
+        <bpmn:incoming>AF2</bpmn:incoming>
+        <bpmn:outgoing>AF3</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:sendTask id="SA_Ergebnis" name="Ergebnis mitteilen" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen">
+        <bpmn:documentation>Nachricht an die Pflege-App: Lieferung abgeschlossen, neuer Bestand.</bpmn:documentation>
+        <bpmn:incoming>AF3</bpmn:incoming>
+        <bpmn:outgoing>AF4</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:endEvent id="SA_End" name="Vorgang geschlossen">
+        <bpmn:incoming>AF4</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="AF1" sourceRef="SA_Start" targetRef="SA_Fortschreiben" />
+      <bpmn:sequenceFlow id="AF2" sourceRef="SA_Fortschreiben" targetRef="SA_Nachweis" />
+      <bpmn:sequenceFlow id="AF3" sourceRef="SA_Nachweis" targetRef="SA_Ergebnis" />
+      <bpmn:sequenceFlow id="AF4" sourceRef="SA_Ergebnis" targetRef="SA_End" />
+    </bpmn:subProcess>
+    <bpmn:endEvent id="End_Abgeschlossen" name="Nachversorgung abgeschlossen">
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;vorgangszustand&#39;, &#39;Erfolgreich abgeschlossen&#39;)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F24</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F03" sourceRef="Start_Timer" targetRef="GW_Start" />
+    <bpmn:sequenceFlow id="F01" sourceRef="Start_Manuell" targetRef="GW_Start" />
+    <bpmn:sequenceFlow id="F02" sourceRef="Start_Bedingt" targetRef="GW_Start" />
+    <bpmn:sequenceFlow id="F04" sourceRef="GW_Start" targetRef="T_Offen" />
+    <bpmn:sequenceFlow id="F05" sourceRef="T_Offen" targetRef="GW_Offen" />
+    <bpmn:sequenceFlow id="F06" name="Ja" sourceRef="GW_Offen" targetRef="End_Offen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${vorgangOffen}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F07" name="Nein" sourceRef="GW_Offen" targetRef="SP_Bedarf">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!vorgangOffen}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F08" sourceRef="SP_Bedarf" targetRef="GW_Bedarf" />
+    <bpmn:sequenceFlow id="F09" name="Ja" sourceRef="GW_Bedarf" targetRef="XOR_BF">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nachversorgungErforderlich}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F10" name="Nein" sourceRef="GW_Bedarf" targetRef="End_Ausreichend">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!nachversorgungErforderlich}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F20" name="Ersatz erforderlich" sourceRef="GW_Bestellung" targetRef="XOR_BF">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellabwicklungErgebnis == 'Ersatz erforderlich'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F11" sourceRef="XOR_BF" targetRef="CA_Bestellfreigabe" />
+    <bpmn:sequenceFlow id="F12" sourceRef="CA_Bestellfreigabe" targetRef="GW_Freigabe" />
+    <bpmn:sequenceFlow id="F13" name="Bestellung freigegeben" sourceRef="GW_Freigabe" targetRef="CA_Bestellabwicklung">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung freigegeben'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F14" name="Bestellung nicht zulässig" sourceRef="GW_Freigabe" targetRef="End_NichtZulaessig">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung nicht zulässig'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F16" name="Bestellung aufgeschoben" sourceRef="GW_Freigabe" targetRef="End_Aufgeschoben">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung aufgeschoben'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F17" sourceRef="CA_Bestellabwicklung" targetRef="GW_Bestellung" />
+    <bpmn:sequenceFlow id="F18" name="Bestellung bestätigt" sourceRef="GW_Bestellung" targetRef="CA_Lieferpruefung">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellabwicklungErgebnis == 'Bestellung bestätigt'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F19" name="Keine Bestellung möglich" sourceRef="GW_Bestellung" targetRef="End_KeineBestellung">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellabwicklungErgebnis == 'Keine Bestellung möglich'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F21" sourceRef="CA_Lieferpruefung" targetRef="GW_Lieferung" />
+    <bpmn:sequenceFlow id="F22" name="Lieferung abgeschlossen" sourceRef="GW_Lieferung" targetRef="SP_Abschluss">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lieferpruefungErgebnis == 'Lieferung abgeschlossen'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F23" name="Lieferung ungeklärt" sourceRef="GW_Lieferung" targetRef="End_Ungeklaert">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lieferpruefungErgebnis == 'Lieferung ungeklärt'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F24" sourceRef="SP_Abschluss" targetRef="End_Abgeschlossen" />
+    <bpmn:endEvent id="End_NichtFreigegeben" name="Bestellung nicht freigegeben">
+      <bpmn:documentation>Sendendes Nachrichten-Endereignis: meldet Ergebnis und Reichweitenrisiko an die Pflege-App und schreibt den Vorgang (Zustand, Grund) in der Datenbank fort (Stiehl Punkt 3).</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:executionListener expression="${execution.setVariable(&#39;vorgangszustand&#39;, &#39;Erfolglos abgeschlossen&#39;)}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F15</bpmn:incoming>
+      <bpmn:messageEventDefinition id="End_NichtFreigegeben_Def" camunda:type="external" camunda:topic="t2-ergebnis-mitteilen" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F15" name="Bestellung nicht freigegeben" sourceRef="GW_Freigabe" targetRef="End_NichtFreigegeben">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bestellfreigabeErgebnis == 'Bestellung nicht freigegeben'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmn:message id="Msg_Bestandsmeldung" name="PflegeApp_Bestandsmeldung_Team2" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collab_T2_Materialversorgung">
+      <bpmndi:BPMNShape id="P_Team3_di" bpmnElement="P_Team3" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="3980" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_Lieferant_di" bpmnElement="P_Lieferant" isHorizontal="true">
+        <dc:Bounds x="120" y="140" width="3980" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_PflegeApp_di" bpmnElement="P_PflegeApp" isHorizontal="true">
+        <dc:Bounds x="120" y="200" width="3980" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_Materialversorgung_di" bpmnElement="P_Materialversorgung" isHorizontal="true">
+        <dc:Bounds x="120" y="270" width="3980" height="520" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Timer_di" bpmnElement="Start_Timer">
+        <dc:Bounds x="182" y="662" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="702" width="91" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Manuell_di" bpmnElement="Start_Manuell">
+        <dc:Bounds x="272" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="249" y="552" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Bedingt_di" bpmnElement="Start_Bedingt">
+        <dc:Bounds x="362" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="347" y="350" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Start_di" bpmnElement="GW_Start" isMarkerVisible="true">
+        <dc:Bounds x="355" y="505" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Offen_di" bpmnElement="T_Offen">
+        <dc:Bounds x="430" y="490" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Offen_di" bpmnElement="GW_Offen" isMarkerVisible="true">
+        <dc:Bounds x="595" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="581" y="559" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Offen_di" bpmnElement="End_Offen">
+        <dc:Bounds x="602" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="647" y="386" width="105" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Bedarf_di" bpmnElement="GW_Bedarf" isMarkerVisible="true">
+        <dc:Bounds x="1225" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1210" y="463" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Ausreichend_di" bpmnElement="End_Ausreichend">
+        <dc:Bounds x="1232" y="652" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1165" y="660" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="XOR_BF_di" bpmnElement="XOR_BF" isMarkerVisible="true">
+        <dc:Bounds x="1305" y="505" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CA_Bestellfreigabe_di" bpmnElement="CA_Bestellfreigabe">
+        <dc:Bounds x="1370" y="490" width="320" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Freigabe_di" bpmnElement="GW_Freigabe" isMarkerVisible="true">
+        <dc:Bounds x="1805" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1753" y="554" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_NichtZulaessig_di" bpmnElement="End_NichtZulaessig">
+        <dc:Bounds x="1722" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1629" y="400" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_NichtFreigegeben_di" bpmnElement="End_NichtFreigegeben">
+        <dc:Bounds x="1812" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1757" y="302" width="78" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Aufgeschoben_di" bpmnElement="End_Aufgeschoben">
+        <dc:Bounds x="1902" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1947" y="400" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CA_Bestellabwicklung_di" bpmnElement="CA_Bestellabwicklung">
+        <dc:Bounds x="2040" y="490" width="320" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Bestellung_di" bpmnElement="GW_Bestellung" isMarkerVisible="true">
+        <dc:Bounds x="2425" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2379" y="554" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_KeineBestellung_di" bpmnElement="End_KeineBestellung">
+        <dc:Bounds x="2432" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2471" y="390" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CA_Lieferpruefung_di" bpmnElement="CA_Lieferpruefung">
+        <dc:Bounds x="2580" y="490" width="560" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Lieferung_di" bpmnElement="GW_Lieferung" isMarkerVisible="true">
+        <dc:Bounds x="3195" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3135" y="554" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Ungeklaert_di" bpmnElement="End_Ungeklaert">
+        <dc:Bounds x="3202" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3254" y="390" width="46" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Abgeschlossen_di" bpmnElement="End_Abgeschlossen">
+        <dc:Bounds x="4022" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4000" y="552" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SP_Bedarf_di" bpmnElement="SP_Bedarf" isExpanded="true">
+        <dc:Bounds x="700" y="450" width="480" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SB_Start_di" bpmnElement="SB_Start">
+        <dc:Bounds x="720" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="700" y="552" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SB_Reichweite_di" bpmnElement="SB_Reichweite">
+        <dc:Bounds x="795" y="490" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SB_Bedarf_di" bpmnElement="SB_Bedarf">
+        <dc:Bounds x="945" y="490" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SB_End_di" bpmnElement="SB_End">
+        <dc:Bounds x="1122" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1103" y="552" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SF1_di" bpmnElement="SF1">
+        <di:waypoint x="756" y="530" />
+        <di:waypoint x="795" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF2_di" bpmnElement="SF2">
+        <di:waypoint x="935" y="530" />
+        <di:waypoint x="945" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SF3_di" bpmnElement="SF3">
+        <di:waypoint x="1095" y="530" />
+        <di:waypoint x="1122" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SP_Abschluss_di" bpmnElement="SP_Abschluss" isExpanded="true">
+        <dc:Bounds x="3330" y="430" width="650" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SA_Start_di" bpmnElement="SA_Start">
+        <dc:Bounds x="3362" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3347" y="552" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SA_Fortschreiben_di" bpmnElement="SA_Fortschreiben">
+        <dc:Bounds x="3420" y="490" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SA_Nachweis_di" bpmnElement="SA_Nachweis">
+        <dc:Bounds x="3580" y="490" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SA_Ergebnis_di" bpmnElement="SA_Ergebnis">
+        <dc:Bounds x="3740" y="490" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SA_End_di" bpmnElement="SA_End">
+        <dc:Bounds x="3912" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3899" y="552" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="AF1_di" bpmnElement="AF1">
+        <di:waypoint x="3398" y="530" />
+        <di:waypoint x="3420" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AF2_di" bpmnElement="AF2">
+        <di:waypoint x="3560" y="530" />
+        <di:waypoint x="3580" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AF3_di" bpmnElement="AF3">
+        <di:waypoint x="3720" y="530" />
+        <di:waypoint x="3740" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="AF4_di" bpmnElement="AF4">
+        <di:waypoint x="3880" y="530" />
+        <di:waypoint x="3912" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F03_di" bpmnElement="F03">
+        <di:waypoint x="218" y="680" />
+        <di:waypoint x="380" y="680" />
+        <di:waypoint x="380" y="555" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F01_di" bpmnElement="F01">
+        <di:waypoint x="308" y="530" />
+        <di:waypoint x="355" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F02_di" bpmnElement="F02">
+        <di:waypoint x="380" y="418" />
+        <di:waypoint x="380" y="505" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F04_di" bpmnElement="F04">
+        <di:waypoint x="405" y="530" />
+        <di:waypoint x="430" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F05_di" bpmnElement="F05">
+        <di:waypoint x="570" y="530" />
+        <di:waypoint x="595" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F06_di" bpmnElement="F06">
+        <di:waypoint x="620" y="505" />
+        <di:waypoint x="620" y="418" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="635" y="450" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07_di" bpmnElement="F07">
+        <di:waypoint x="645" y="530" />
+        <di:waypoint x="700" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="654" y="510" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F08_di" bpmnElement="F08">
+        <di:waypoint x="1180" y="530" />
+        <di:waypoint x="1225" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F09_di" bpmnElement="F09">
+        <di:waypoint x="1275" y="530" />
+        <di:waypoint x="1305" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1285" y="510" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10">
+        <di:waypoint x="1250" y="555" />
+        <di:waypoint x="1250" y="652" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1262" y="580" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_di" bpmnElement="F20">
+        <di:waypoint x="2450" y="555" />
+        <di:waypoint x="2450" y="720" />
+        <di:waypoint x="1330" y="720" />
+        <di:waypoint x="1330" y="555" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2468" y="643" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11">
+        <di:waypoint x="1355" y="530" />
+        <di:waypoint x="1370" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12">
+        <di:waypoint x="1690" y="530" />
+        <di:waypoint x="1805" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13">
+        <di:waypoint x="1855" y="530" />
+        <di:waypoint x="2040" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1871" y="538" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14">
+        <di:waypoint x="1819" y="516" />
+        <di:waypoint x="1740" y="516" />
+        <di:waypoint x="1740" y="428" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1649" y="450" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15">
+        <di:waypoint x="1830" y="505" />
+        <di:waypoint x="1830" y="388" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1832" y="420" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16">
+        <di:waypoint x="1841" y="516" />
+        <di:waypoint x="1920" y="516" />
+        <di:waypoint x="1920" y="428" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1926" y="450" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17">
+        <di:waypoint x="2360" y="530" />
+        <di:waypoint x="2425" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18_di" bpmnElement="F18">
+        <di:waypoint x="2475" y="530" />
+        <di:waypoint x="2580" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2487" y="538" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_di" bpmnElement="F19">
+        <di:waypoint x="2450" y="505" />
+        <di:waypoint x="2450" y="418" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2450" y="456" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_di" bpmnElement="F21">
+        <di:waypoint x="3140" y="530" />
+        <di:waypoint x="3195" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22_di" bpmnElement="F22">
+        <di:waypoint x="3245" y="530" />
+        <di:waypoint x="3330" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3253" y="496" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F23_di" bpmnElement="F23">
+        <di:waypoint x="3220" y="505" />
+        <di:waypoint x="3220" y="418" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3233" y="446" width="46" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F24_di" bpmnElement="F24">
+        <di:waypoint x="3980" y="530" />
+        <di:waypoint x="4022" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="P_Team1_di" bpmnElement="P_Team1" isHorizontal="true">
+        <dc:Bounds x="120" y="830" width="3980" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A_Ersatz_Assoc_di" bpmnElement="A_Ersatz_Assoc">
+        <di:waypoint x="1860" y="720" />
+        <di:waypoint x="1860" y="685" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="A_Ersatz_di" bpmnElement="A_Ersatz">
+        <dc:Bounds x="1700" y="645" width="320" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="M04_di" bpmnElement="M04">
+        <di:waypoint x="1650" y="490" />
+        <di:waypoint x="1650" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1667" y="315" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M10_di" bpmnElement="M10">
+        <di:waypoint x="2320" y="490" />
+        <di:waypoint x="2320" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2337" y="315" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M15_di" bpmnElement="M15">
+        <di:waypoint x="2980" y="490" />
+        <di:waypoint x="2980" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2998" y="315" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M16_di" bpmnElement="M16">
+        <di:waypoint x="3100" y="130" />
+        <di:waypoint x="3100" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3114" y="315" width="91" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M08_di" bpmnElement="M08">
+        <di:waypoint x="2080" y="490" />
+        <di:waypoint x="2080" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2113" y="315" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M09_di" bpmnElement="M09">
+        <di:waypoint x="2200" y="190" />
+        <di:waypoint x="2200" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2222" y="315" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M12_di" bpmnElement="M12">
+        <di:waypoint x="2620" y="190" />
+        <di:waypoint x="2620" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2636" y="315" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M02_di" bpmnElement="M02">
+        <di:waypoint x="1410" y="490" />
+        <di:waypoint x="1410" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1426" y="315" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M05_di" bpmnElement="M05">
+        <di:waypoint x="1740" y="392" />
+        <di:waypoint x="1740" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1746" y="266" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M06_di" bpmnElement="M06">
+        <di:waypoint x="1830" y="352" />
+        <di:waypoint x="1830" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1836" y="266" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M07_di" bpmnElement="M07">
+        <di:waypoint x="1920" y="392" />
+        <di:waypoint x="1920" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1926" y="266" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M11_di" bpmnElement="M11">
+        <di:waypoint x="2450" y="382" />
+        <di:waypoint x="2450" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2456" y="266" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M13_di" bpmnElement="M13">
+        <di:waypoint x="2740" y="490" />
+        <di:waypoint x="2740" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2746" y="315" width="106" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M17_di" bpmnElement="M17">
+        <di:waypoint x="3220" y="382" />
+        <di:waypoint x="3220" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3226" y="266" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M19_di" bpmnElement="M19">
+        <di:waypoint x="3810" y="490" />
+        <di:waypoint x="3810" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3816" y="315" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M01_di" bpmnElement="M01">
+        <di:waypoint x="290" y="250" />
+        <di:waypoint x="290" y="512" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="201" y="450" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M03_di" bpmnElement="M03">
+        <di:waypoint x="1530" y="250" />
+        <di:waypoint x="1530" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1535" y="315" width="109" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M14_di" bpmnElement="M14">
+        <di:waypoint x="2860" y="250" />
+        <di:waypoint x="2860" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2874" y="315" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M18_di" bpmnElement="M18">
+        <di:waypoint x="3650" y="570" />
+        <di:waypoint x="3650" y="830" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3659" y="800" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>
 <!-- Ende des KI-generierten Teils -->
