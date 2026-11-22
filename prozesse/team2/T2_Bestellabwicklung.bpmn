@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- KI-generiert (Claude, Anthropic) - Beginn. Team 2 Materialversorgung, Pflege-Backoffice MVP, DPE WS 2026/27 (Prof. Stiehl). Verantwortlich im Team: Saifudin Mohammadi (BPMN). Lizenz: MIT. -->
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_T2_Bestellabwicklung" targetNamespace="http://thi.de/dpe/team2" exporter="Camunda Modeler" exporterVersion="5.52.0">
   <bpmn:collaboration id="Collab_T2_Bestellabwicklung">
     <bpmn:participant id="P_Lieferant" name="Lieferant (simuliert)" />
@@ -300,4 +299,3 @@
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
-<!-- Ende des KI-generierten Teils -->
