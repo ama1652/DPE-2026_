@@ -36,6 +36,15 @@ for pid,(fn,t,p) in files.items():
         if ln in ('task','serviceTask','sendTask','receiveTask','userTask','businessRuleTask','callActivity'):
             ins=[s for s in p.findall('b:sequenceFlow',NS) if s.get('targetRef')==e.get('id')]
             if len(ins)>2: fehler.append(f'{fn}: {e.get("name")} hat {len(ins)} eingehende Linien (max. 2)')
+    # Stiehl Punkt 9: jede Zusammenführung über ein XOR, auch in eingebetteten Teilprozessen
+    for e in p.iter():
+        if not isinstance(e.tag, str): continue
+        ln=etree.QName(e).localname
+        if ln in ('task','serviceTask','sendTask','receiveTask','userTask','businessRuleTask','callActivity',
+                  'subProcess','endEvent','intermediateThrowEvent','intermediateCatchEvent'):
+            par=e.getparent()
+            ins=[s for s in par.findall('b:sequenceFlow',NS) if s.get('targetRef')==e.get('id')]
+            if len(ins)>1: fehler.append(f'{fn}: "{e.get("name")}" hat {len(ins)} eingehende Flüsse ohne XOR-Merge (Punkt 9)')
     for ca in p.findall('b:callActivity',NS):
         ce=ca.get('calledElement')
         if ce not in files: fehler.append(f'{fn}: calledElement {ce} fehlt'); continue

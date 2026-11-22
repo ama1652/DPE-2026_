@@ -51,8 +51,8 @@
 | ID | Story | Akzeptanzkriterien | Pkt | Wer | Sprint |
 |---|---|---|---|---|---|
 | T2-06 | Als **Entwicklerteam** möchten wir alle 5 BPMN-Dateien auf CIB seven deployen, damit wir das Modell testen können. | Deploy ohne Fehler · Instanz startet im Cockpit | 2 | Mohammed | S1 |
-| T2-07 | Als **Backoffice** möchte ich, dass Verbrauch und Reichweite berechnet werden und die Regel den Bedarf feststellt, damit rechtzeitig nachbestellt wird. | Worker `t2-reichweite-berechnen` · **DMN „Nachversorgungsbedarf“** setzt `nachversorgungErforderlich` · Worker `t2-pruefung-terminieren` | 5 | Mohammed | S1 |
-| T2-08 | Als **Backoffice** möchte ich einen Bestellvorschlag (Menge = Zielbestand − Ist-Bestand, aufgerundet auf die Packung) und eine Abweichungsprüfung, damit nur Abweichungen zum Menschen gehen. | Worker `t2-vorschlag-erstellen`, `t2-abweichungen-pruefen` · Preis, Produktwechsel, Verbrauchssprung, Lieferant, Menge | 5 | Mohammed | S2 |
+| T2-07 | Als **Backoffice** möchte ich, dass Verbrauch und Reichweite berechnet werden und die Regel den Bedarf feststellt, damit rechtzeitig nachbestellt wird. | Worker `t2-reichweite-berechnen` · **DMN „Nachversorgungsbedarf“** setzt `nachversorgungErforderlich` · Worker `t2-vorgang-pruefen` (laufende Instanz mit Business Key `PH-<Haushalt>:<Produkt>` suchen, setzt `vorgangOffen`) | 5 | Mohammed | S1 |
+| T2-08 | Als **Backoffice** möchte ich einen Bestellvorschlag (Menge = Zielbestand − Ist-Bestand, aufgerundet auf die Packung) und eine Ersatzprüfung, damit nur Abweichungen zum Menschen gehen und die Ersatz-Schleife endet. | Worker `t2-vorschlag-erstellen`, `t2-ersatzoption-pruefen` (setzt `ersatzMoeglich`, höchstens 2 Bestellversuche) · Abweichungen ermittelt die DMN „Berechtigungsregel“ | 5 | Mohammed | S2 |
 | T2-09 | Als **Team 1, 2 und 3** möchten wir eine gemeinsame **Berechtigungsregel**, damit überall gleich entschieden wird, was ohne Freigabe erlaubt ist. | **DMN „Berechtigungsregel“** → `AUTOMATISCH` / `KUNDENFREIGABE` / `PRUEFUNG` · ab 2. Bestellversuch `PRUEFUNG` · Quelle oder „Projektannahme“ je Regel | 5 | Mohammed | S2 |
 | T2-10 | Als **Backoffice** möchte ich, dass nach der Lieferung der Bestand fortgeschrieben wird. | Worker `t2-bestand-fortschreiben` schreibt in die DB (nutzt Repository von T2-03) | 2 | Mohammed | S2 |
 
@@ -60,8 +60,8 @@
 
 | ID | Story | Akzeptanzkriterien | Pkt | Wer | Sprint |
 |---|---|---|---|---|---|
-| T2-11 | Als **Pflegeperson** möchte ich Freigabeanfrage, Erinnerung, Reichweitenrisiko, Bestätigungsanfrage und Ergebnis in der App sehen. | Ein Worker für die 5 Sendeaufgaben (Topics `t2-…-senden/-mitteilen/-anfordern`) · schreibt die Nachricht in eine Tabelle/Log „App-Postfach“ (Simulation, klar gekennzeichnet) | 5 | **Saifudin** | S1 |
-| T2-12 | Als **Pflegeperson** möchte ich in der App freigeben, ändern oder ablehnen, die Lieferung bestätigen und das Risiko quittieren. | REST-Endpunkte der App-Simulation → `POST /message` (`PflegeApp_Kundenentscheidung_Team2`, `…_Lieferbestaetigung_Team2`, `…_Kenntnisnahme_Team2`) · Korrelation über `vorgangId` | 5 | Erion | S2 |
+| T2-11 | Als **Pflegeperson** möchte ich Freigabeanfrage, Bestätigungsanfrage und jedes Ergebnis (auch Abbrüche mit Reichweitenrisiko) in der App sehen. | Ein Worker für die Sendeaufgaben und Nachrichten-Endereignisse (Topics `t2-freigabeanfrage-senden`, `t2-lieferbestaetigung-anfordern`, `t2-ergebnis-mitteilen`; schreibt bei Abbrüchen `vorgangszustand` fort) · schreibt die Nachricht in eine Tabelle/Log „App-Postfach“ (Simulation, klar gekennzeichnet) | 5 | **Saifudin** | S1 |
+| T2-12 | Als **Pflegeperson** möchte ich in der App freigeben, ändern, ablehnen oder aufschieben und die Lieferung bestätigen. | REST-Endpunkte der App-Simulation → `POST /message` (`PflegeApp_Kundenentscheidung_Team2` mit FREIGEBEN/AENDERN/ABLEHNEN/AUFSCHIEBEN, `…_Lieferbestaetigung_Team2`) · Korrelation über `vorgangId` | 5 | Erion | S2 |
 | T2-13 | Als **Team 1 und 3** möchten wir die Kundenentscheidung mitnutzen, damit wir keine eigene bauen müssen. | Schnittstellenvereinbarung (Vorlage D) mit Ein-/Ausgaben · im Integrationskreis vorgestellt · Entscheidung im Protokoll | 2 | **Saifudin** | S1 |
 
 ## Epic E5 – Bestellung und Lieferant (Messaging und Integration)
