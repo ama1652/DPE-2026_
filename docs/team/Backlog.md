@@ -4,7 +4,7 @@
 >
 > **Aufgabenbrett:** jede Story ist ein [GitHub Issue](https://github.com/mohammadisaifuddin187-dev/DPE-2026_/issues) mit gleicher Nummer (T2-05 = #5), Labels `epic: …` / `wer: …`, Meilenstein = Sprint.
 >
-> **Stand:** 17.11.2026 · Format wie in TerraMax: *Als … möchte ich …, damit …* + Akzeptanzkriterien. Punkte nach Fibonacci (1, 2, 3, 5, 8).
+> **Stand:** 22.11.2026 (an Stiehls 11 Punkte angepasst) · Format wie in TerraMax: *Als … möchte ich …, damit …* + Akzeptanzkriterien. Punkte nach Fibonacci (1, 2, 3, 5, 8).
 
 ## Sprints
 
@@ -53,7 +53,7 @@
 | T2-06 | Als **Entwicklerteam** möchten wir alle 5 BPMN-Dateien auf CIB seven deployen, damit wir das Modell testen können. | Deploy ohne Fehler · Instanz startet im Cockpit | 2 | Mohammed | S1 |
 | T2-07 | Als **Backoffice** möchte ich, dass Verbrauch und Reichweite berechnet werden und die Regel den Bedarf feststellt, damit rechtzeitig nachbestellt wird. | Worker `t2-reichweite-berechnen` · **DMN „Nachversorgungsbedarf“** setzt `nachversorgungErforderlich` · Worker `t2-vorgang-pruefen` (laufende Instanz mit Business Key `PH-<Haushalt>:<Produkt>` suchen, setzt `vorgangOffen`) | 5 | Mohammed | S1 |
 | T2-08 | Als **Backoffice** möchte ich einen Bestellvorschlag (Menge = Zielbestand − Ist-Bestand, aufgerundet auf die Packung) und eine Ersatzprüfung, damit nur Abweichungen zum Menschen gehen und die Ersatz-Schleife endet. | Worker `t2-vorschlag-erstellen`, `t2-ersatzoption-pruefen` (setzt `ersatzMoeglich`, höchstens 2 Bestellversuche) · Abweichungen ermittelt die DMN „Berechtigungsregel“ | 5 | Mohammed | S2 |
-| T2-09 | Als **Team 1, 2 und 3** möchten wir eine gemeinsame **Berechtigungsregel**, damit überall gleich entschieden wird, was ohne Freigabe erlaubt ist. | **DMN „Berechtigungsregel“** → `AUTOMATISCH` / `KUNDENFREIGABE` / `PRUEFUNG` · ab 2. Bestellversuch `PRUEFUNG` · Quelle oder „Projektannahme“ je Regel | 5 | Mohammed | S2 |
+| T2-09 | Als **Team 1, 2 und 3** möchten wir eine gemeinsame **Berechtigungsregel**, damit überall gleich entschieden wird, was ohne Freigabe erlaubt ist. | **DMN „Berechtigungsregel“** → `AUTOMATISCH` / `KUNDENFREIGABE` / `PRUEFUNG` · ermittelt die Abweichungen (Preis, Produktwechsel, Verbrauchssprung, Lieferant, Menge) · Quelle oder „Projektannahme“ je Regel | 5 | Mohammed | S2 |
 | T2-10 | Als **Backoffice** möchte ich, dass nach der Lieferung der Bestand fortgeschrieben wird. | Worker `t2-bestand-fortschreiben` schreibt in die DB (nutzt Repository von T2-03) | 2 | Mohammed | S2 |
 
 ## Epic E4 – Pflege-App und Benachrichtigung (gemeinsame Funktion)
@@ -99,7 +99,7 @@
 | T2-27 | Abgabe: Code + Datenbankabzug an Stiehl, Fehlerliste, Lizenzhinweise | 2 |
 
 ## Saifudins Paket (das leichteste) in Kurzform
-1. **T2-11 Benachrichtigungs-Worker:** ein External-Task-Worker, der 5 Topics abholt und die Nachricht ins „App-Postfach“ schreibt. Wenig Logik, gut erklärbar.
+1. **T2-11 Benachrichtigungs-Worker:** ein External-Task-Worker, der die Topics für Anfragen und Ergebnis abholt und die Nachricht ins „App-Postfach“ schreibt. Wenig Logik, gut erklärbar.
 2. **T2-13 Schnittstelle Kundenentscheidung:** Vorlage D ausfüllen, die Inhalte stehen schon in der README.
 3. **T2-19 Testdaten:** ein SQL-Skript.
 4. **T2-20 Startanleitung:** aufschreiben, was die anderen einrichten.
