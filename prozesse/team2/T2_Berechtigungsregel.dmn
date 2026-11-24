@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- KI-generiert (Claude, Anthropic) - Beginn. Team 2 Materialversorgung, Pflege-Backoffice MVP, DPE WS 2026/27 (Prof. Stiehl). Verantwortlich im Team: Mohammed (DMN). Lizenz: MIT. Entwurf, muss von Team 2 geprüft werden. -->
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_T2_Berechtigungsregel" name="Berechtigungsregel" namespace="http://thi.de/dpe/team2" exporter="Team 2 (KI-unterstützt)" exporterVersion="1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
+  <decision id="Berechtigungsregel" name="Berechtigungsregel anwenden" camunda:historyTimeToLive="P180D">
+    <description>Teamauftrag 2, Schritte 5 und 6: bewertet Preis, Produktwechsel, Verbrauchssprung, Lieferant und Menge und bestimmt daraus den Freigabeweg AUTOMATISCH, KUNDENFREIGABE oder PRUEFUNG. Aufgerufen von der Regelaufgabe "Berechtigungsregel anwenden" (T2_Bestellfreigabe). Die Eingaben setzt vorher der Worker t2-vorschlag-erstellen. Hit Policy FIRST: Die Regeln stehen in der Reihenfolge PRUEFUNG vor KUNDENFREIGABE vor AUTOMATISCH, die erste zutreffende gewinnt. Damit gewinnt immer der strengste Weg. Nur der erste Grund steht in freigabeBegruendung. Quelle je Regel siehe Regelbeschreibung.</description>
+    <decisionTable id="DT_Berechtigungsregel" hitPolicy="FIRST">
+      <input id="In_Vollstaendig" label="Daten vollständig?">
+        <description>Sicherung: Fehlt eine Eingabe, darf nie automatisch freigegeben werden.</description>
+        <inputExpression id="InExpr_Vollstaendig" typeRef="boolean">
+          <text>produktHinterlegt != null and produktGewechselt != null and lieferantGewechselt != null and verbrauchssprung != null and preisGesamt != null and preisgrenze != null and bestellmenge != null and zielbestand != null</text>
+        </inputExpression>
+      </input>
+      <input id="In_Hinterlegt" label="Produkt im Versorgungsprofil hinterlegt?">
+        <inputExpression id="InExpr_Hinterlegt" typeRef="boolean"><text>produktHinterlegt</text></inputExpression>
+      </input>
+      <input id="In_Verbrauch" label="Verbrauch deutlich verändert?">
+        <inputExpression id="InExpr_Verbrauch" typeRef="boolean"><text>verbrauchssprung</text></inputExpression>
+      </input>
+      <input id="In_Preis" label="Preis gesamt (EUR)">
+        <inputExpression id="InExpr_Preis" typeRef="number"><text>preisGesamt</text></inputExpression>
+      </input>
+      <input id="In_Produkt" label="Produkt gewechselt?">
+        <inputExpression id="InExpr_Produkt" typeRef="boolean"><text>produktGewechselt</text></inputExpression>
+      </input>
+      <input id="In_Lieferant" label="Lieferant gewechselt?">
+        <inputExpression id="InExpr_Lieferant" typeRef="boolean"><text>lieferantGewechselt</text></inputExpression>
+      </input>
+      <input id="In_Menge" label="Bestellmenge (Stück)">
+        <inputExpression id="InExpr_Menge" typeRef="number"><text>bestellmenge</text></inputExpression>
+      </input>
+      <output id="Out_Weg" label="Freigabeweg" name="freigabeweg" typeRef="string">
+        <outputValues id="OV_Weg"><text>"PRUEFUNG","KUNDENFREIGABE","AUTOMATISCH"</text></outputValues>
+      </output>
+      <output id="Out_Begruendung" label="Begründung" name="freigabeBegruendung" typeRef="string" />
+      <rule id="R1_Unvollstaendig">
+        <description>Projektannahme (Sicherheit): Ohne vollständige Daten keine automatische Freigabe.</description>
+        <inputEntry id="IE1_1"><text>false</text></inputEntry>
+        <inputEntry id="IE1_2"><text></text></inputEntry>
+        <inputEntry id="IE1_3"><text></text></inputEntry>
+        <inputEntry id="IE1_4"><text></text></inputEntry>
+        <inputEntry id="IE1_5"><text></text></inputEntry>
+        <inputEntry id="IE1_6"><text></text></inputEntry>
+        <inputEntry id="IE1_7"><text></text></inputEntry>
+        <outputEntry id="OE1_1"><text>"PRUEFUNG"</text></outputEntry>
+        <outputEntry id="OE1_2"><text>"Daten für die Berechtigungsprüfung unvollständig"</text></outputEntry>
+      </rule>
+      <rule id="R2_Ungeklaert">
+        <description>Quelle: Teamauftrag 2, Rollen ("Menschliche Prüfstelle bearbeitet ... ungeklärte Produkte") und Ausnahmen ("nur hinterlegte Ersatzoptionen anbieten").</description>
+        <inputEntry id="IE2_1"><text>true</text></inputEntry>
+        <inputEntry id="IE2_2"><text>false</text></inputEntry>
+        <inputEntry id="IE2_3"><text></text></inputEntry>
+        <inputEntry id="IE2_4"><text></text></inputEntry>
+        <inputEntry id="IE2_5"><text></text></inputEntry>
+        <inputEntry id="IE2_6"><text></text></inputEntry>
+        <inputEntry id="IE2_7"><text></text></inputEntry>
+        <outputEntry id="OE2_1"><text>"PRUEFUNG"</text></outputEntry>
+        <outputEntry id="OE2_2"><text>"Produkt nicht im Versorgungsprofil hinterlegt"</text></outputEntry>
+      </rule>
+      <rule id="R3_Verbrauch">
+        <description>Quelle: Teamauftrag 2, Rollen ("Menschliche Prüfstelle bearbeitet ungewöhnlichen Verbrauch") und Ausnahmen ("keine stille Mengenerhöhung; Abweichung erklären und Entscheidung einholen"). Die Prüfstelle kann danach nur Kundenfreigabe einholen oder "nicht zulässig" (T2-006), der Kunde entscheidet also immer mit.</description>
+        <inputEntry id="IE3_1"><text>true</text></inputEntry>
+        <inputEntry id="IE3_2"><text></text></inputEntry>
+        <inputEntry id="IE3_3"><text>true</text></inputEntry>
+        <inputEntry id="IE3_4"><text></text></inputEntry>
+        <inputEntry id="IE3_5"><text></text></inputEntry>
+        <inputEntry id="IE3_6"><text></text></inputEntry>
+        <inputEntry id="IE3_7"><text></text></inputEntry>
+        <outputEntry id="OE3_1"><text>"PRUEFUNG"</text></outputEntry>
+        <outputEntry id="OE3_2"><text>"Verbrauch deutlich verändert"</text></outputEntry>
+      </rule>
+      <rule id="R4_Preis">
+        <description>Quelle: Teamauftrag 2, Ausnahmen ("Preisgrenze überschritten: Freigabe mit Mehrkosten oder alternative Auswahl anfordern"); Integrationspaket, Testhaushalt ("Preisabweichungen über dem hinterlegten Testwert benötigen Freigabe"). Die Preisgrenze steht im Versorgungsprofil (konfigurierbar).</description>
+        <inputEntry id="IE4_1"><text>true</text></inputEntry>
+        <inputEntry id="IE4_2"><text></text></inputEntry>
+        <inputEntry id="IE4_3"><text></text></inputEntry>
+        <inputEntry id="IE4_4"><text>&gt; preisgrenze</text></inputEntry>
+        <inputEntry id="IE4_5"><text></text></inputEntry>
+        <inputEntry id="IE4_6"><text></text></inputEntry>
+        <inputEntry id="IE4_7"><text></text></inputEntry>
+        <outputEntry id="OE4_1"><text>"KUNDENFREIGABE"</text></outputEntry>
+        <outputEntry id="OE4_2"><text>"Preisgrenze überschritten"</text></outputEntry>
+      </rule>
+      <rule id="R5_Produkt">
+        <description>Quelle: Teamauftrag 2, Ausnahmen ("Bevorzugtes Produkt nicht verfügbar: nur hinterlegte Ersatzoptionen anbieten"). Anbieten heißt: der Kunde entscheidet.</description>
+        <inputEntry id="IE5_1"><text>true</text></inputEntry>
+        <inputEntry id="IE5_2"><text></text></inputEntry>
+        <inputEntry id="IE5_3"><text></text></inputEntry>
+        <inputEntry id="IE5_4"><text></text></inputEntry>
+        <inputEntry id="IE5_5"><text>true</text></inputEntry>
+        <inputEntry id="IE5_6"><text></text></inputEntry>
+        <inputEntry id="IE5_7"><text></text></inputEntry>
+        <outputEntry id="OE5_1"><text>"KUNDENFREIGABE"</text></outputEntry>
+        <outputEntry id="OE5_2"><text>"Ersatzprodukt statt bevorzugtem Produkt"</text></outputEntry>
+      </rule>
+      <rule id="R6_Lieferant">
+        <description>Projektannahme: Ein anderer Lieferant als im Versorgungsprofil braucht die Zustimmung des Kunden.</description>
+        <inputEntry id="IE6_1"><text>true</text></inputEntry>
+        <inputEntry id="IE6_2"><text></text></inputEntry>
+        <inputEntry id="IE6_3"><text></text></inputEntry>
+        <inputEntry id="IE6_4"><text></text></inputEntry>
+        <inputEntry id="IE6_5"><text></text></inputEntry>
+        <inputEntry id="IE6_6"><text>true</text></inputEntry>
+        <inputEntry id="IE6_7"><text></text></inputEntry>
+        <outputEntry id="OE6_1"><text>"KUNDENFREIGABE"</text></outputEntry>
+        <outputEntry id="OE6_2"><text>"Anderer Lieferant als im Versorgungsprofil"</text></outputEntry>
+      </rule>
+      <rule id="R7_Menge">
+        <description>Projektannahme zu Teamauftrag 2 ("keine stille Mengenerhöhung"): Mehr als der Zielbestand (z. B. durch Aufrunden auf die Packung) braucht die Zustimmung des Kunden.</description>
+        <inputEntry id="IE7_1"><text>true</text></inputEntry>
+        <inputEntry id="IE7_2"><text></text></inputEntry>
+        <inputEntry id="IE7_3"><text></text></inputEntry>
+        <inputEntry id="IE7_4"><text></text></inputEntry>
+        <inputEntry id="IE7_5"><text></text></inputEntry>
+        <inputEntry id="IE7_6"><text></text></inputEntry>
+        <inputEntry id="IE7_7"><text>&gt; zielbestand</text></inputEntry>
+        <outputEntry id="OE7_1"><text>"KUNDENFREIGABE"</text></outputEntry>
+        <outputEntry id="OE7_2"><text>"Bestellmenge über Zielbestand"</text></outputEntry>
+      </rule>
+      <rule id="R8_Automatisch">
+        <description>Quelle: Teamauftrag 2, Schritt 6 ("Automatisch simulierbar"). Keine Abweichung: Vorschlag entspricht dem Versorgungsprofil.</description>
+        <inputEntry id="IE8_1"><text>true</text></inputEntry>
+        <inputEntry id="IE8_2"><text></text></inputEntry>
+        <inputEntry id="IE8_3"><text></text></inputEntry>
+        <inputEntry id="IE8_4"><text></text></inputEntry>
+        <inputEntry id="IE8_5"><text></text></inputEntry>
+        <inputEntry id="IE8_6"><text></text></inputEntry>
+        <inputEntry id="IE8_7"><text></text></inputEntry>
+        <outputEntry id="OE8_1"><text>"AUTOMATISCH"</text></outputEntry>
+        <outputEntry id="OE8_2"><text>"Keine Abweichung vom Versorgungsprofil"</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_T2_Berechtigungsregel">
+      <dmndi:DMNShape id="DMNShape_Berechtigungsregel" dmnElementRef="Berechtigungsregel">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
+<!-- Ende des KI-generierten Teils -->

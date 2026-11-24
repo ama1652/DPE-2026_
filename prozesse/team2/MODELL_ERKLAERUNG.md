@@ -45,7 +45,7 @@ Was sich nach dem Feedback geändert hat, steht in der README unter [Runde 2](RE
 2. **„Laufenden Vorgang prüfen“** (Service-Aufgabe): Gibt es schon eine Instanz mit dem Business Key `PH-<Haushalt>:<Produkt>`? Wenn ja → Ende „Vorgang bereits offen“. So kann ein zweiter Start nicht doppelt bestellen (Stiehl Punkt 2).
 3. **Bedarfsermittlung** (eingebettet, aufgeklappt):
    - „Verbrauch und Reichweite berechnen“ liest den Ist-Bestand aus der Datenbank.
-   - Regelaufgabe „Nachversorgungsbedarf feststellen“ (DMN).
+   - Regelaufgabe „Nachversorgungsbedarf feststellen“: Die Engine wertet die DMN direkt aus (`decisionRef`), siehe [DMN.md](DMN.md).
    - **Ein** Ende „Bedarf ermittelt“. Der Teilprozess liefert nur Daten (`nachversorgungErforderlich`). Entschieden wird erst am Gateway danach (Stiehl Punkt 8). Bei „Nein“ → Ende „Bestand ausreichend“. Einen Folgetermin setzt niemand, das macht der zyklische Timer (Punkt 1).
 4. Ein **XOR-Merge** vor der Bestellfreigabe nimmt auch die Ersatz-Schleife auf (Punkt 9).
 5. **Bestellfreigabe** (Call Activity) endet mit einem von 4 Ergebnissen:

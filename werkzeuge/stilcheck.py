@@ -1,4 +1,4 @@
-# Prüft Label-Matching (Stiehl Regeln 10-12, 14, 16, 17) und Camunda-7-Pflichtattribute.
+# Prüft Label-Matching (Stiehl Regeln 10-12, 14, 16, 17), Camunda-7-Pflichtattribute und die Verweise der Regelaufgaben auf die DMN-Dateien.
 import glob, sys
 from lxml import etree
 NS={'b':'http://www.omg.org/spec/BPMN/20100524/MODEL','c':'http://camunda.org/schema/1.0/bpmn'}
@@ -6,6 +6,11 @@ C='{http://camunda.org/schema/1.0/bpmn}'
 D=sys.argv[1]; files={}; fehler=[]
 for f in glob.glob(D+'/*.bpmn'):
     t=etree.parse(f); p=t.find('.//b:process[@isExecutable="true"]',NS); files[p.get('id')]=(f.split('/')[-1],t,p)
+# DMN-Entscheidungen im selben Ordner (id -> Datei)
+decisions={}
+for f in glob.glob(D+'/*.dmn'):
+    for d in etree.parse(f).getroot().iter('{https://www.omg.org/spec/DMN/20191111/MODEL/}decision'):
+        decisions[d.get('id')]=f.split('/')[-1]
 def ends(p): return sorted(e.get('name') for e in p.findall('b:endEvent',NS))
 def msgs(t): return sorted(m.get('name') for m in t.findall('.//b:messageFlow',NS))
 for pid,(fn,t,p) in files.items():
@@ -20,7 +25,7 @@ for pid,(fn,t,p) in files.items():
     if not p.get(C+'historyTimeToLive'): fehler.append(f'{fn}: historyTimeToLive fehlt')
     for e in p:
         ln=etree.QName(e).localname
-        if ln in ('serviceTask','sendTask','businessRuleTask') and not (e.get(C+'topic') and e.get(C+'type')=='external'):
+        if ln in ('serviceTask','sendTask') and not (e.get(C+'topic') and e.get(C+'type')=='external'):
             fehler.append(f'{fn}: {e.get("id")} ohne external topic')
         if ln=='userTask' and not e.get(C+'candidateGroups'): fehler.append(f'{fn}: {e.get("id")} ohne candidateGroups')
         if ln=='userTask' and e.find('.//c:formData',NS) is None: fehler.append(f'{fn}: {e.get("id")} ohne Formular')
@@ -36,6 +41,13 @@ for pid,(fn,t,p) in files.items():
         if ln in ('task','serviceTask','sendTask','receiveTask','userTask','businessRuleTask','callActivity'):
             ins=[s for s in p.findall('b:sequenceFlow',NS) if s.get('targetRef')==e.get('id')]
             if len(ins)>2: fehler.append(f'{fn}: {e.get("name")} hat {len(ins)} eingehende Linien (max. 2)')
+    # Regelaufgaben (auch in eingebetteten Teilprozessen): decisionRef auf eine vorhandene DMN-Entscheidung
+    for e in p.iter('{%s}businessRuleTask' % NS['b']):
+        ref=e.get(C+'decisionRef')
+        if not ref: fehler.append(f'{fn}: Regelaufgabe {e.get("id")} ohne camunda:decisionRef')
+        elif ref not in decisions: fehler.append(f'{fn}: decisionRef {ref} nicht in einer .dmn-Datei gefunden')
+        elif not e.get(C+'resultVariable'): fehler.append(f'{fn}: Regelaufgabe {e.get("id")} ohne camunda:resultVariable')
+        else: print(f'DMN ok: {fn} {e.get("name")} -> {decisions[ref]}')
     # Stiehl Punkt 9: jede Zusammenführung über ein XOR, auch in eingebetteten Teilprozessen
     for e in p.iter():
         if not isinstance(e.tag, str): continue

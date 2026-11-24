@@ -2,7 +2,7 @@
 
 > **KI-Kennzeichnung (Kursregel):** Modelle, Bilder und dieser Text wurden mit KI-Unterstützung erstellt (Claude, Anthropic) und müssen von Team 2 geprüft werden. Wer im Team welchen Teil verantwortet, steht in [Aufgabenverteilung](../../docs/team/Aufgabenverteilung.md).
 >
-> **Stand:** 22.11.2026, **überarbeitet nach der schriftlichen Rückmeldung von Prof. Stiehl (11 Punkte)**, siehe [Runde 2](#runde-2-schriftliche-rückmeldung-von-stiehl-22112026). Davor: [Runde 1](#runde-1-feedback-beim-meilenstein-17112026) (Meilenstein). **Grundlage:** Teamauftrag 2, Gemeinsames Projekthandbuch, Integrations- und Organisationspaket (alle v1.0), Vorlesung „BPMN Best Practices“ (Method & Style). **Technik:** CIB seven (Camunda 7), External Tasks, JUEL. DMN, Simulator und Tests kommen später.
+> **Stand:** 22.11.2026, **überarbeitet nach der schriftlichen Rückmeldung von Prof. Stiehl (11 Punkte)**, siehe [Runde 2](#runde-2-schriftliche-rückmeldung-von-stiehl-22112026). Davor: [Runde 1](#runde-1-feedback-beim-meilenstein-17112026) (Meilenstein). **Grundlage:** Teamauftrag 2, Gemeinsames Projekthandbuch, Integrations- und Organisationspaket (alle v1.0), Vorlesung „BPMN Best Practices“ (Method & Style). **Technik:** CIB seven (Camunda 7), External Tasks, JUEL. DMN siehe [DMN.md](DMN.md) (24.11.2026). Simulator und weitere Tests kommen später.
 
 > **Ausführliche Erklärung, Schwächen und Prüfungsfragen:** [MODELL_ERKLAERUNG.md](MODELL_ERKLAERUNG.md)
 
@@ -15,6 +15,8 @@
 | `T2_Kundenentscheidung.bpmn` | **Gemeinsamer Baustein** für Team 1, 2 und 3 (Senden/Empfangen über die Pflege-App, Nachfassen über Team 3) | 7 |
 | `T2_Bestellabwicklung.bpmn` | Bestellung senden (JMS), Antwort empfangen, Nachfassen über Team 3, Ersatzoption prüfen | 8–9 |
 | `T2_Lieferpruefung.bpmn` | Versand, Lieferbestätigung über die App, Klärung über Team 3 | 9–10 |
+| `T2_Nachversorgungsbedarf.dmn` | Entscheidungstabelle: Reicht der Bestand bis Prüftermin + Lieferzeit? → [DMN.md](DMN.md) | 3 |
+| `T2_Berechtigungsregel.dmn` | Entscheidungstabelle: AUTOMATISCH, KUNDENFREIGABE oder PRUEFUNG → [DMN.md](DMN.md) | 5–6 |
 
 Eine Instanz entspricht einem Nachversorgungsvorgang für ein Produkt eines Pflegehaushalts, **Business Key `PH-<Haushalt>:<Produkt>`**. Den Ist-Bestand führt Team 2 selbst in der eigenen Datenbank (führendes System).
 
@@ -81,7 +83,7 @@ Die Zuordnung zu den Zuständen ist ein Vorschlag für den Integrationskreis.
 | Situation | Wo im Modell |
 |---|---|
 | Bestand nicht gemeldet | Entfällt: Den Bestand führt Team 2 selbst (T2-003). |
-| Verbrauch deutlich verändert | Bedarfsermittlung markiert `verbrauchssprung` → Berechtigungsregel → Kundenfreigabe (keine stille Mengenerhöhung) |
+| Verbrauch deutlich verändert | Bedarfsermittlung markiert `verbrauchssprung` → Berechtigungsregel → Prüfstelle → Kundenfreigabe einholen oder nicht zulässig (keine stille Mengenerhöhung; siehe [DMN.md](DMN.md), offener Punkt 1) |
 | Preisgrenze überschritten | Berechtigungsregel ermittelt die Abweichung → Kundenentscheidung |
 | Bevorzugtes Produkt nicht verfügbar | Bestellabwicklung → „Ersatzoption prüfen“ → „Ersatz erforderlich“ (zurück zur Bestellfreigabe, nur hinterlegte Ersatzoptionen) oder „Keine Bestellung möglich“ |
 | Lieferant antwortet nicht | Antwortfrist → Nachfassen über Team 3 → nach erneuter Frist „Ersatzoption prüfen“ |
