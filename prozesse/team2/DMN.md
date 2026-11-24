@@ -36,6 +36,9 @@ Das Ergebnis ist eine Map in `berechtigungErgebnis` bzw. `bedarfErgebnis`. Je ei
 | 1 | `< mindestbestand` | true | `zielbestand − istBestand` | Bestand reicht nicht bis nächster Prüftermin plus Lieferzeit |
 | 2 | `>= mindestbestand` | false | 0 | Bestand ausreichend … |
 
+![DRD Nachversorgungsbedarf](bilder/T2_Nachversorgungsbedarf_DRD.png)
+![Tabelle Nachversorgungsbedarf](bilder/T2_Nachversorgungsbedarf_Tabelle.png)
+
 **Beispiel:** 60 Stück, 4 pro Tag, 10 + 3 Tage → 8 übrig < Mindestbestand 30 → nachversorgen, Bedarf 120 − 60 = 60. Aufgerundet auf die Packung wird erst in „Produkt und Menge vorschlagen“.
 
 **Quelle:** Teamauftrag 2, Schritte 2–3 und Geschäftsobjekt „Nachversorgungsbedarf“. Mindestbestand als Grenze und „Prüfintervall + Lieferzeit“ als Vorlauf sind **Projektannahmen**.
@@ -50,16 +53,29 @@ Das Ergebnis ist eine Map in `berechtigungErgebnis` bzw. `bedarfErgebnis`. Je ei
 
 | # | Bedingung | freigabeweg | Begründung | Quelle |
 |---|---|---|---|---|
-| 1 | Eine Eingabe fehlt | PRUEFUNG | Daten unvollständig | Projektannahme (Sicherheit: nie automatisch ohne Daten) |
-| 2 | Produkt nicht im Versorgungsprofil hinterlegt | PRUEFUNG | Produkt nicht hinterlegt | Teamauftrag 2: Prüfstelle bearbeitet „ungeklärte Produkte“ |
-| 3 | Verbrauch deutlich verändert | PRUEFUNG | Verbrauch deutlich verändert | Teamauftrag 2: Prüfstelle bearbeitet „ungewöhnlichen Verbrauch“; „keine stille Mengenerhöhung“ |
-| 4 | `preisGesamt > preisgrenze` | KUNDENFREIGABE | Preisgrenze überschritten | Teamauftrag 2, Ausnahmen; Integrationspaket „Freigabegrenze“ |
-| 5 | Ersatzprodukt statt bevorzugtem | KUNDENFREIGABE | Ersatzprodukt | Teamauftrag 2: „nur hinterlegte Ersatzoptionen anbieten“ |
-| 6 | Anderer Lieferant | KUNDENFREIGABE | Anderer Lieferant | Projektannahme |
-| 7 | `bestellmenge > zielbestand` | KUNDENFREIGABE | Menge über Zielbestand | Projektannahme zu „keine stille Mengenerhöhung“ |
-| 8 | sonst | AUTOMATISCH | Keine Abweichung | Teamauftrag 2, Schritt 6: „automatisch simulierbar“ |
+| 1 | Produkt nicht im Versorgungsprofil hinterlegt | PRUEFUNG | Produkt nicht hinterlegt | Teamauftrag 2: Prüfstelle bearbeitet „ungeklärte Produkte“ |
+| 2 | Verbrauch deutlich verändert | PRUEFUNG | Verbrauch deutlich verändert | Teamauftrag 2: Prüfstelle bearbeitet „ungewöhnlichen Verbrauch“; „keine stille Mengenerhöhung“ |
+| 3 | `preisGesamt > preisgrenze` | KUNDENFREIGABE | Preisgrenze überschritten | Teamauftrag 2, Ausnahmen; Integrationspaket „Freigabegrenze“ |
+| 4 | Ersatzprodukt statt bevorzugtem | KUNDENFREIGABE | Ersatzprodukt | Teamauftrag 2: „nur hinterlegte Ersatzoptionen anbieten“ |
+| 5 | Anderer Lieferant | KUNDENFREIGABE | Anderer Lieferant | Projektannahme |
+| 6 | `bestellmenge > zielbestand` | KUNDENFREIGABE | Menge über Zielbestand | Projektannahme zu „keine stille Mengenerhöhung“ |
+| 7 | ausdrücklich keine Abweichung (Produkt hinterlegt, kein Verbrauchssprung, Preis ≤ Grenze, kein Produkt- oder Lieferantenwechsel, Menge ≤ Zielbestand) | AUTOMATISCH | Keine Abweichung | Teamauftrag 2, Schritt 6: „automatisch simulierbar“ |
+
+Fehlt eine Eingabe, greift keine Regel. Der Prozess bleibt dann mit einem Incident stehen und gibt nie automatisch frei.
+
+![DRD Berechtigungsregel](bilder/T2_Berechtigungsregel_DRD.png)
+![Tabelle Berechtigungsregel](bilder/T2_Berechtigungsregel_Tabelle.png)
 
 `freigabeBegruendung` geht als Anlass an die Prüfstelle (Formular „Grenzfall prüfen“) bzw. als Begründung an die Kundenentscheidung.
+
+## Zusammenspiel BPMN und DMN
+
+| Regelaufgabe im BPMN | Entscheidung (DMN) | Gateway danach | Ausgänge ↔ Ergebnis der Tabelle |
+|---|---|---|---|
+| „Nachversorgungsbedarf feststellen“ (in der Bedarfsermittlung) | „Nachversorgungsbedarf feststellen“ | „Nachversorgung erforderlich?“ (nach dem Teilprozess) | Ja ↔ `true`, Nein ↔ `false` |
+| „Berechtigungsregel anwenden“ | „Berechtigungsregel anwenden“ | „Freigabeweg?“ | „Automatisch zulässig“ ↔ AUTOMATISCH, „Kundenfreigabe erforderlich“ ↔ KUNDENFREIGABE, „Prüfung erforderlich“ ↔ PRUEFUNG |
+
+Die Regelaufgabe und die Entscheidung heißen gleich, und jedes Ergebnis der Tabelle hat genau einen Ausgang am Gateway. Die fünf Abweichungen aus Teamauftrag Schritt 5 (Preis, Produktwechsel, Verbrauchssprung, Lieferant, Menge) sind die Spalten der Berechtigungsregel. Deshalb gibt es keine eigene Aufgabe „Abweichungen prüfen“ mehr (Stiehl Punkt 11).
 
 ## Offene Punkte – bitte im Team klären
 
@@ -73,7 +89,7 @@ Das Ergebnis ist eine Map in `berechtigungErgebnis` bzw. `bedarfErgebnis`. Je ei
 
 `werkzeuge/dmn-test/` deployt alle 5 BPMN- und beide DMN-Dateien in eine Camunda-7.22-Engine im Speicher (H2) und prüft:
 
-- beide Tabellen mit Beispielwerten (inkl. Grenzwerte und fehlende Daten),
+- beide Tabellen mit Beispielwerten (inkl. Grenzwerte; fehlende Daten ergeben nie AUTOMATISCH),
 - im Prozess: Bestand reicht → Ende „Bestand ausreichend“; Vorschlag ohne Abweichung → weiter zur Bestellabwicklung; Preis zu hoch → Kundenentscheidung; Verbrauchssprung → Benutzeraufgabe „Grenzfall prüfen“ mit Begründung.
 
 ```bash

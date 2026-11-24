@@ -62,8 +62,9 @@ public class DmnTest {
     assertEquals("PRUEFUNG", weg(ok().putValue("produktHinterlegt", false)));
     // strengster Weg gewinnt
     assertEquals("PRUEFUNG", weg(ok().putValue("preisGesamt", 99.0).putValue("verbrauchssprung", true)));
-    // fehlende Daten -> nie automatisch
-    var fehlt = ok(); fehlt.remove("preisGesamt"); assertEquals("PRUEFUNG", weg(fehlt));
+    // fehlende Daten -> keine Regel greift (Prozess bekäme einen Incident), nie AUTOMATISCH
+    var fehlt = ok(); fehlt.remove("preisGesamt");
+    assertNull(ds.evaluateDecisionByKey("Berechtigungsregel").variables(fehlt).evaluate().getSingleResult());
   }
 
   ProcessInstance startBedarf(double ist, boolean sprung) {
