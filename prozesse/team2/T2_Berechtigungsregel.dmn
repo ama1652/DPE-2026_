@@ -1,134 +1,296 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- KI-generiert (Claude, Anthropic) - Beginn. Team 2 Materialversorgung, Pflege-Backoffice MVP, DPE WS 2026/27 (Prof. Stiehl). Verantwortlich im Team: Mohammed (DMN). Lizenz: MIT. Entwurf, muss von Team 2 geprüft werden. -->
-<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_T2_Berechtigungsregel" name="Berechtigungsregel" namespace="http://thi.de/dpe/team2" exporter="Team 2 (KI-unterstützt)" exporterVersion="1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
+<!-- Beginn KI-generiert (Claude, Anthropic) -->
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_T2_Berechtigungsregel" name="Berechtigungsregel" namespace="http://thi.de/dpe/team2" exporter="Team 2" exporterVersion="1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
   <decision id="Berechtigungsregel" name="Berechtigungsregel anwenden" camunda:historyTimeToLive="P180D">
-    <description>Teamauftrag 2, Schritte 5 und 6: bewertet Preis, Produktwechsel, Verbrauchssprung, Lieferant und Menge und bestimmt daraus den Freigabeweg AUTOMATISCH, KUNDENFREIGABE oder PRUEFUNG. Aufgerufen von der Regelaufgabe "Berechtigungsregel anwenden" (T2_Bestellfreigabe). Die Eingaben setzt vorher der Worker t2-vorschlag-erstellen. Hit Policy FIRST: Die Regeln stehen in der Reihenfolge PRUEFUNG vor KUNDENFREIGABE vor AUTOMATISCH, die erste zutreffende gewinnt. Damit gewinnt immer der strengste Weg. AUTOMATISCH nur, wenn ausdrücklich keine Abweichung vorliegt. Nur der erste Grund steht in freigabeBegruendung. Quelle je Regel siehe Regelbeschreibung.</description>
-    <informationRequirement id="IR_Vorschlag"><requiredInput href="#ID_Vorschlag" /></informationRequirement>
-    <informationRequirement id="IR_Profil"><requiredInput href="#ID_Profil" /></informationRequirement>
-    <informationRequirement id="IR_Sprung"><requiredInput href="#ID_Sprung" /></informationRequirement>
-    <authorityRequirement id="AR_Auftrag"><requiredAuthority href="#KS_Auftrag" /></authorityRequirement>
-    <authorityRequirement id="AR_Annahme"><requiredAuthority href="#KS_Annahme" /></authorityRequirement>
+    <informationRequirement id="IR_Vorschlag">
+      <requiredInput href="#ID_Vorschlag" />
+    </informationRequirement>
+    <informationRequirement id="IR_Profil">
+      <requiredInput href="#ID_Profil" />
+    </informationRequirement>
+    <informationRequirement id="IR_Sprung">
+      <requiredInput href="#ID_Sprung" />
+    </informationRequirement>
+    <authorityRequirement id="AR_Auftrag">
+      <requiredAuthority href="#KS_Auftrag" />
+    </authorityRequirement>
+    <authorityRequirement id="AR_Annahme">
+      <requiredAuthority href="#KS_Annahme" />
+    </authorityRequirement>
     <decisionTable id="DT_Berechtigungsregel" hitPolicy="FIRST">
-      <input id="In_Hinterlegt" label="Produkt im Versorgungsprofil hinterlegt?">
-        <inputExpression id="InExpr_Hinterlegt" typeRef="boolean"><text>produktHinterlegt</text></inputExpression>
+      <input id="Input_Hinterlegt" label="Produkt im Versorgungsprofil hinterlegt?">
+        <inputExpression id="InputExpression_Hinterlegt" typeRef="boolean">
+          <text>produktHinterlegt</text>
+        </inputExpression>
       </input>
-      <input id="In_Verbrauch" label="Verbrauch deutlich verändert?">
-        <inputExpression id="InExpr_Verbrauch" typeRef="boolean"><text>verbrauchssprung</text></inputExpression>
+      <input id="Input_Verbrauch" label="Verbrauch deutlich verändert?">
+        <inputExpression id="InputExpression_Verbrauch" typeRef="boolean">
+          <text>verbrauchssprung</text>
+        </inputExpression>
       </input>
-      <input id="In_Preis" label="Preis gesamt (EUR)">
-        <inputExpression id="InExpr_Preis" typeRef="number"><text>preisGesamt</text></inputExpression>
+      <input id="Input_Preis" label="Preis gesamt (EUR)">
+        <inputExpression id="InputExpression_Preis" typeRef="number">
+          <text>preisGesamt</text>
+        </inputExpression>
       </input>
-      <input id="In_Produkt" label="Produkt gewechselt?">
-        <inputExpression id="InExpr_Produkt" typeRef="boolean"><text>produktGewechselt</text></inputExpression>
+      <input id="Input_Produkt" label="Produkt gewechselt?">
+        <inputExpression id="InputExpression_Produkt" typeRef="boolean">
+          <text>produktGewechselt</text>
+        </inputExpression>
       </input>
-      <input id="In_Lieferant" label="Lieferant gewechselt?">
-        <inputExpression id="InExpr_Lieferant" typeRef="boolean"><text>lieferantGewechselt</text></inputExpression>
+      <input id="Input_Lieferant" label="Lieferant gewechselt?">
+        <inputExpression id="InputExpression_Lieferant" typeRef="boolean">
+          <text>lieferantGewechselt</text>
+        </inputExpression>
       </input>
-      <input id="In_Menge" label="Bestellmenge (Stück)">
-        <inputExpression id="InExpr_Menge" typeRef="number"><text>bestellmenge</text></inputExpression>
+      <input id="Input_Menge" label="Bestellmenge (Stück)">
+        <inputExpression id="InputExpression_Menge" typeRef="number">
+          <text>bestellmenge</text>
+        </inputExpression>
       </input>
-      <output id="Out_Weg" label="Freigabeweg" name="freigabeweg" typeRef="string">
-        <outputValues id="OV_Weg"><text>"PRUEFUNG","KUNDENFREIGABE","AUTOMATISCH"</text></outputValues>
+      <output id="Output_Weg" label="Freigabeweg" name="freigabeweg" typeRef="string">
+        <outputValues id="OutputValues_Weg">
+          <text>"PRUEFUNG","KUNDENFREIGABE","AUTOMATISCH"</text>
+        </outputValues>
       </output>
-      <output id="Out_Begruendung" label="Begründung" name="freigabeBegruendung" typeRef="string" />
-      <rule id="R2_Ungeklaert">
-        <description>Teamauftrag 2: Prüfstelle bearbeitet &quot;ungeklärte Produkte&quot;</description>
-        <inputEntry id="IE2_2"><text>false</text></inputEntry>
-        <inputEntry id="IE2_3"><text></text></inputEntry>
-        <inputEntry id="IE2_4"><text></text></inputEntry>
-        <inputEntry id="IE2_5"><text></text></inputEntry>
-        <inputEntry id="IE2_6"><text></text></inputEntry>
-        <inputEntry id="IE2_7"><text></text></inputEntry>
-        <outputEntry id="OE2_1"><text>"PRUEFUNG"</text></outputEntry>
-        <outputEntry id="OE2_2"><text>"Produkt nicht im Versorgungsprofil hinterlegt"</text></outputEntry>
+      <output id="Output_Begruendung" label="Begründung" name="freigabeBegruendung" typeRef="string" />
+      <rule id="Rule_1">
+        <description>Teamauftrag 2: ungeklärte Produkte gehen an die Prüfstelle</description>
+        <inputEntry id="InputEntry_1_1">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_6">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>"PRUEFUNG"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>"Produkt nicht im Versorgungsprofil hinterlegt"</text>
+        </outputEntry>
       </rule>
-      <rule id="R3_Verbrauch">
-        <description>Teamauftrag 2: Prüfstelle bearbeitet &quot;ungewöhnlichen Verbrauch&quot;; keine stille Mengenerhöhung. Danach entscheidet der Kunde (T2-006).</description>
-        <inputEntry id="IE3_2"><text></text></inputEntry>
-        <inputEntry id="IE3_3"><text>true</text></inputEntry>
-        <inputEntry id="IE3_4"><text></text></inputEntry>
-        <inputEntry id="IE3_5"><text></text></inputEntry>
-        <inputEntry id="IE3_6"><text></text></inputEntry>
-        <inputEntry id="IE3_7"><text></text></inputEntry>
-        <outputEntry id="OE3_1"><text>"PRUEFUNG"</text></outputEntry>
-        <outputEntry id="OE3_2"><text>"Verbrauch deutlich verändert"</text></outputEntry>
+      <rule id="Rule_2">
+        <description>Teamauftrag 2: ungewöhnlicher Verbrauch geht an die Prüfstelle</description>
+        <inputEntry id="InputEntry_2_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_2">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_6">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>"PRUEFUNG"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>"Verbrauch deutlich verändert"</text>
+        </outputEntry>
       </rule>
-      <rule id="R4_Preis">
-        <description>Teamauftrag 2, Ausnahmen: &quot;Preisgrenze überschritten&quot;; Integrationspaket: Freigabegrenze</description>
-        <inputEntry id="IE4_2"><text></text></inputEntry>
-        <inputEntry id="IE4_3"><text></text></inputEntry>
-        <inputEntry id="IE4_4"><text>&gt; preisgrenze</text></inputEntry>
-        <inputEntry id="IE4_5"><text></text></inputEntry>
-        <inputEntry id="IE4_6"><text></text></inputEntry>
-        <inputEntry id="IE4_7"><text></text></inputEntry>
-        <outputEntry id="OE4_1"><text>"KUNDENFREIGABE"</text></outputEntry>
-        <outputEntry id="OE4_2"><text>"Preisgrenze überschritten"</text></outputEntry>
+      <rule id="Rule_3">
+        <description>Teamauftrag 2, Ausnahmen: Preisgrenze überschritten</description>
+        <inputEntry id="InputEntry_3_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_3">
+          <text>&gt; preisgrenze</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_6">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_3_1">
+          <text>"KUNDENFREIGABE"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_2">
+          <text>"Preisgrenze überschritten"</text>
+        </outputEntry>
       </rule>
-      <rule id="R5_Produkt">
-        <description>Teamauftrag 2, Ausnahmen: &quot;nur hinterlegte Ersatzoptionen anbieten&quot;</description>
-        <inputEntry id="IE5_2"><text></text></inputEntry>
-        <inputEntry id="IE5_3"><text></text></inputEntry>
-        <inputEntry id="IE5_4"><text></text></inputEntry>
-        <inputEntry id="IE5_5"><text>true</text></inputEntry>
-        <inputEntry id="IE5_6"><text></text></inputEntry>
-        <inputEntry id="IE5_7"><text></text></inputEntry>
-        <outputEntry id="OE5_1"><text>"KUNDENFREIGABE"</text></outputEntry>
-        <outputEntry id="OE5_2"><text>"Ersatzprodukt statt bevorzugtem Produkt"</text></outputEntry>
+      <rule id="Rule_4">
+        <description>Teamauftrag 2, Ausnahmen: nur hinterlegte Ersatzoptionen anbieten</description>
+        <inputEntry id="InputEntry_4_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_4">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_6">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_4_1">
+          <text>"KUNDENFREIGABE"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_2">
+          <text>"Ersatzprodukt statt bevorzugtem Produkt"</text>
+        </outputEntry>
       </rule>
-      <rule id="R6_Lieferant">
+      <rule id="Rule_5">
         <description>Projektannahme</description>
-        <inputEntry id="IE6_2"><text></text></inputEntry>
-        <inputEntry id="IE6_3"><text></text></inputEntry>
-        <inputEntry id="IE6_4"><text></text></inputEntry>
-        <inputEntry id="IE6_5"><text></text></inputEntry>
-        <inputEntry id="IE6_6"><text>true</text></inputEntry>
-        <inputEntry id="IE6_7"><text></text></inputEntry>
-        <outputEntry id="OE6_1"><text>"KUNDENFREIGABE"</text></outputEntry>
-        <outputEntry id="OE6_2"><text>"Anderer Lieferant als im Versorgungsprofil"</text></outputEntry>
+        <inputEntry id="InputEntry_5_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_5">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_6">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_5_1">
+          <text>"KUNDENFREIGABE"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_2">
+          <text>"Anderer Lieferant als im Versorgungsprofil"</text>
+        </outputEntry>
       </rule>
-      <rule id="R7_Menge">
-        <description>Projektannahme (&quot;keine stille Mengenerhöhung&quot;)</description>
-        <inputEntry id="IE7_2"><text></text></inputEntry>
-        <inputEntry id="IE7_3"><text></text></inputEntry>
-        <inputEntry id="IE7_4"><text></text></inputEntry>
-        <inputEntry id="IE7_5"><text></text></inputEntry>
-        <inputEntry id="IE7_6"><text></text></inputEntry>
-        <inputEntry id="IE7_7"><text>&gt; zielbestand</text></inputEntry>
-        <outputEntry id="OE7_1"><text>"KUNDENFREIGABE"</text></outputEntry>
-        <outputEntry id="OE7_2"><text>"Bestellmenge über Zielbestand"</text></outputEntry>
+      <rule id="Rule_6">
+        <description>Projektannahme: keine stille Mengenerhöhung</description>
+        <inputEntry id="InputEntry_6_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_6">
+          <text>&gt; zielbestand</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_6_1">
+          <text>"KUNDENFREIGABE"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_2">
+          <text>"Bestellmenge über Zielbestand"</text>
+        </outputEntry>
       </rule>
-      <rule id="R8_Automatisch">
-        <description>Teamauftrag 2, Schritt 6: &quot;automatisch simulierbar&quot;. Fehlen Daten, greift keine Regel (nie automatisch).</description>
-        <inputEntry id="IE8_2"><text>true</text></inputEntry>
-        <inputEntry id="IE8_3"><text>false</text></inputEntry>
-        <inputEntry id="IE8_4"><text>&lt;= preisgrenze</text></inputEntry>
-        <inputEntry id="IE8_5"><text>false</text></inputEntry>
-        <inputEntry id="IE8_6"><text>false</text></inputEntry>
-        <inputEntry id="IE8_7"><text>&lt;= zielbestand</text></inputEntry>
-        <outputEntry id="OE8_1"><text>"AUTOMATISCH"</text></outputEntry>
-        <outputEntry id="OE8_2"><text>"Keine Abweichung vom Versorgungsprofil"</text></outputEntry>
+      <rule id="Rule_7">
+        <description>Teamauftrag 2, Schritt 6: automatisch simulierbar</description>
+        <inputEntry id="InputEntry_7_1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_2">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_3">
+          <text>&lt;= preisgrenze</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_4">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_5">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_6">
+          <text>&lt;= zielbestand</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_7_1">
+          <text>"AUTOMATISCH"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_7_2">
+          <text>"Keine Abweichung vom Versorgungsprofil"</text>
+        </outputEntry>
       </rule>
     </decisionTable>
   </decision>
-  <inputData id="ID_Vorschlag" name="Bestellvorschlag (Produkt, Lieferant, Preis, Menge)" />
-  <inputData id="ID_Profil" name="Versorgungsprofil (hinterlegte Produkte, Lieferant, Preisgrenze, Zielbestand)" />
-  <inputData id="ID_Sprung" name="Verbrauchssprung (aus der Bedarfsermittlung)" />
-  <knowledgeSource id="KS_Auftrag" name="Teamauftrag 2 (Rollen, Ausnahmen)" />
-  <knowledgeSource id="KS_Annahme" name="Projektannahmen Team 2" />
+  <inputData id="ID_Vorschlag" name="Bestellvorschlag: Produkt, Lieferant, Preis, Menge" />
+  <inputData id="ID_Profil" name="Versorgungsprofil: Produkte, Lieferant, Preisgrenze, Zielbestand" />
+  <inputData id="ID_Sprung" name="Verbrauchssprung" />
+  <knowledgeSource id="KS_Auftrag" name="Teamauftrag 2" />
+  <knowledgeSource id="KS_Annahme" name="Projektannahmen" />
   <dmndi:DMNDI>
-    <dmndi:DMNDiagram id="DMNDiagram_T2_Berechtigungsregel">
-      <dmndi:DMNShape id="DMNShape_Berechtigungsregel" dmnElementRef="Berechtigungsregel"><dc:Bounds height="80" width="200" x="330" y="80" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Vorschlag" dmnElementRef="ID_Vorschlag"><dc:Bounds height="60" width="190" x="100" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Profil" dmnElementRef="ID_Profil"><dc:Bounds height="60" width="190" x="335" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Sprung" dmnElementRef="ID_Sprung"><dc:Bounds height="60" width="190" x="570" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_KS_Auftrag" dmnElementRef="KS_Auftrag"><dc:Bounds height="63" width="140" x="650" y="20" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_KS_Annahme" dmnElementRef="KS_Annahme"><dc:Bounds height="63" width="140" x="650" y="120" /></dmndi:DMNShape>
-      <dmndi:DMNEdge id="DMNEdge_IR_Vorschlag" dmnElementRef="IR_Vorschlag"><di:waypoint x="195" y="300" /><di:waypoint x="380" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_IR_Profil" dmnElementRef="IR_Profil"><di:waypoint x="430" y="300" /><di:waypoint x="430" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_IR_Sprung" dmnElementRef="IR_Sprung"><di:waypoint x="665" y="300" /><di:waypoint x="480" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_AR_Auftrag" dmnElementRef="AR_Auftrag"><di:waypoint x="650" y="52" /><di:waypoint x="530" y="100" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_AR_Annahme" dmnElementRef="AR_Annahme"><di:waypoint x="650" y="150" /><di:waypoint x="530" y="140" /></dmndi:DMNEdge>
+    <dmndi:DMNDiagram id="DMNDiagram_Berechtigungsregel">
+      <dmndi:DMNShape id="DMNShape_Berechtigungsregel" dmnElementRef="Berechtigungsregel">
+        <dc:Bounds height="80" width="200" x="330" y="80" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Vorschlag" dmnElementRef="ID_Vorschlag">
+        <dc:Bounds height="60" width="190" x="100" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Profil" dmnElementRef="ID_Profil">
+        <dc:Bounds height="60" width="190" x="335" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Sprung" dmnElementRef="ID_Sprung">
+        <dc:Bounds height="60" width="190" x="570" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_KS_Auftrag" dmnElementRef="KS_Auftrag">
+        <dc:Bounds height="63" width="140" x="650" y="20" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_KS_Annahme" dmnElementRef="KS_Annahme">
+        <dc:Bounds height="63" width="140" x="650" y="120" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_IR_Vorschlag" dmnElementRef="IR_Vorschlag">
+        <di:waypoint x="195" y="300" />
+        <di:waypoint x="380" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_IR_Profil" dmnElementRef="IR_Profil">
+        <di:waypoint x="430" y="300" />
+        <di:waypoint x="430" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_IR_Sprung" dmnElementRef="IR_Sprung">
+        <di:waypoint x="665" y="300" />
+        <di:waypoint x="480" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_AR_Auftrag" dmnElementRef="AR_Auftrag">
+        <di:waypoint x="650" y="52" />
+        <di:waypoint x="530" y="100" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_AR_Annahme" dmnElementRef="AR_Annahme">
+        <di:waypoint x="650" y="150" />
+        <di:waypoint x="530" y="140" />
+      </dmndi:DMNEdge>
     </dmndi:DMNDiagram>
   </dmndi:DMNDI>
 </definitions>
-<!-- Ende des KI-generierten Teils -->
+<!-- Ende KI-generiert -->

@@ -1,58 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- KI-generiert (Claude, Anthropic) - Beginn. Team 2 Materialversorgung, Pflege-Backoffice MVP, DPE WS 2026/27 (Prof. Stiehl). Verantwortlich im Team: Mohammed (DMN). Lizenz: MIT. Entwurf, muss von Team 2 geprüft werden. -->
-<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_T2_Nachversorgungsbedarf" name="Nachversorgungsbedarf" namespace="http://thi.de/dpe/team2" exporter="Team 2 (KI-unterstützt)" exporterVersion="1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
+<!-- Beginn KI-generiert (Claude, Anthropic) -->
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_T2_Nachversorgungsbedarf" name="Nachversorgungsbedarf" namespace="http://thi.de/dpe/team2" exporter="Team 2" exporterVersion="1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
   <decision id="Nachversorgungsbedarf" name="Nachversorgungsbedarf feststellen" camunda:historyTimeToLive="P180D">
-    <description>Teamauftrag 2, Schritt 3: Reicht der Bestand bis zum nächsten Prüftermin plus Lieferzeit? Aufgerufen von der Regelaufgabe "Nachversorgungsbedarf feststellen" (T2_Materialversorgung, Bedarfsermittlung). Die Eingaben setzt vorher der Worker t2-reichweite-berechnen aus der eigenen Datenbank (Versorgungsprofil, Bestand). Quelle der Logik: Teamauftrag 2 (Schritt 2 und 3, Geschäftsobjekt "Nachversorgungsbedarf"). Mindestbestand als Grenze und "Prüfintervall + Lieferzeit" als Vorlauf: Projektannahme.</description>
-    <informationRequirement id="IR_Bestand"><requiredInput href="#ID_Bestand" /></informationRequirement>
-    <informationRequirement id="IR_Verbrauch"><requiredInput href="#ID_Verbrauch" /></informationRequirement>
-    <informationRequirement id="IR_Profil"><requiredInput href="#ID_Profil" /></informationRequirement>
-    <informationRequirement id="IR_Intervall"><requiredInput href="#ID_Intervall" /></informationRequirement>
-    <authorityRequirement id="AR_Auftrag"><requiredAuthority href="#KS_Auftrag" /></authorityRequirement>
+    <informationRequirement id="IR_Bestand">
+      <requiredInput href="#ID_Bestand" />
+    </informationRequirement>
+    <informationRequirement id="IR_Verbrauch">
+      <requiredInput href="#ID_Verbrauch" />
+    </informationRequirement>
+    <informationRequirement id="IR_Profil">
+      <requiredInput href="#ID_Profil" />
+    </informationRequirement>
+    <informationRequirement id="IR_Intervall">
+      <requiredInput href="#ID_Intervall" />
+    </informationRequirement>
+    <authorityRequirement id="AR_Auftrag">
+      <requiredAuthority href="#KS_Auftrag" />
+    </authorityRequirement>
     <decisionTable id="DT_Nachversorgungsbedarf" hitPolicy="UNIQUE">
-      <input id="In_Prognose" label="Bestand nach Prüfintervall und Lieferzeit">
-        <description>Ist-Bestand minus Verbrauch pro Tag mal (Tage bis zum nächsten Prüftermin + Lieferzeit). So viel ist voraussichtlich noch da, wenn eine erst beim nächsten Prüftermin ausgelöste Bestellung ankäme.</description>
-        <inputExpression id="InExpr_Prognose" typeRef="number">
+      <input id="Input_Prognose" label="Bestand nach Prüfintervall und Lieferzeit">
+        <inputExpression id="InputExpression_Prognose" typeRef="number">
           <text>istBestand - verbrauchProTag * (tageBisPruefung + lieferzeitTage)</text>
         </inputExpression>
       </input>
-      <output id="Out_Erforderlich" label="Nachversorgung erforderlich" name="nachversorgungErforderlich" typeRef="boolean" />
-      <output id="Out_Bedarf" label="Nachversorgungsbedarf (Stück)" name="nachversorgungsbedarf" typeRef="number" />
-      <output id="Out_Begruendung" label="Begründung" name="bedarfsbegruendung" typeRef="string" />
-      <rule id="R_Bedarf_Ja">
-        <description>Bis zum Zielbestand auffüllen; Aufrunden auf die Packung erst im Vorschlag</description>
-        <inputEntry id="IE_Ja"><text>&lt; mindestbestand</text></inputEntry>
-        <outputEntry id="OE_Ja_1"><text>true</text></outputEntry>
-        <outputEntry id="OE_Ja_2"><text>zielbestand - istBestand</text></outputEntry>
-        <outputEntry id="OE_Ja_3"><text>"Bestand reicht nicht bis nächster Prüftermin plus Lieferzeit"</text></outputEntry>
+      <output id="Output_Erforderlich" label="Nachversorgung erforderlich" name="nachversorgungErforderlich" typeRef="boolean" />
+      <output id="Output_Bedarf" label="Nachversorgungsbedarf (Stück)" name="nachversorgungsbedarf" typeRef="number" />
+      <output id="Output_Begruendung" label="Begründung" name="bedarfsbegruendung" typeRef="string" />
+      <rule id="Rule_1">
+        <description>Auffüllen bis zum Zielbestand, Aufrunden auf die Packung erst im Vorschlag</description>
+        <inputEntry id="InputEntry_1">
+          <text>&lt; mindestbestand</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>zielbestand - istBestand</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_3">
+          <text>"Bestand reicht nicht bis zur nächsten Lieferung"</text>
+        </outputEntry>
       </rule>
-      <rule id="R_Bedarf_Nein">
-        <description>Der nächste Prüftermin (Timer) fragt erneut</description>
-        <inputEntry id="IE_Nein"><text>&gt;= mindestbestand</text></inputEntry>
-        <outputEntry id="OE_Nein_1"><text>false</text></outputEntry>
-        <outputEntry id="OE_Nein_2"><text>0</text></outputEntry>
-        <outputEntry id="OE_Nein_3"><text>"Bestand ausreichend bis nächster Prüftermin plus Lieferzeit"</text></outputEntry>
+      <rule id="Rule_2">
+        <description>Nächster Prüftermin prüft erneut</description>
+        <inputEntry id="InputEntry_2">
+          <text>&gt;= mindestbestand</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_3">
+          <text>"Bestand ausreichend"</text>
+        </outputEntry>
       </rule>
     </decisionTable>
   </decision>
-  <inputData id="ID_Bestand" name="Ist-Bestand (eigene Datenbank)" />
-  <inputData id="ID_Verbrauch" name="Verbrauchsannahme (Stück pro Tag)" />
-  <inputData id="ID_Profil" name="Versorgungsprofil (Mindest-, Zielbestand, Lieferzeit)" />
-  <inputData id="ID_Intervall" name="Prüfintervall (10 Tage)" />
-  <knowledgeSource id="KS_Auftrag" name="Teamauftrag 2 (Schritte 2 und 3)" />
+  <inputData id="ID_Bestand" name="Ist-Bestand" />
+  <inputData id="ID_Verbrauch" name="Verbrauch pro Tag" />
+  <inputData id="ID_Profil" name="Versorgungsprofil: Mindest-, Zielbestand, Lieferzeit" />
+  <inputData id="ID_Intervall" name="Prüfintervall" />
+  <knowledgeSource id="KS_Auftrag" name="Teamauftrag 2" />
   <dmndi:DMNDI>
-    <dmndi:DMNDiagram id="DMNDiagram_T2_Nachversorgungsbedarf">
-      <dmndi:DMNShape id="DMNShape_Nachversorgungsbedarf" dmnElementRef="Nachversorgungsbedarf"><dc:Bounds height="80" width="200" x="390" y="80" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Bestand" dmnElementRef="ID_Bestand"><dc:Bounds height="55" width="170" x="80" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Verbrauch" dmnElementRef="ID_Verbrauch"><dc:Bounds height="55" width="170" x="290" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Profil" dmnElementRef="ID_Profil"><dc:Bounds height="55" width="170" x="500" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_ID_Intervall" dmnElementRef="ID_Intervall"><dc:Bounds height="55" width="170" x="710" y="300" /></dmndi:DMNShape>
-      <dmndi:DMNShape id="DMNShape_KS_Auftrag" dmnElementRef="KS_Auftrag"><dc:Bounds height="63" width="140" x="720" y="88" /></dmndi:DMNShape>
-      <dmndi:DMNEdge id="DMNEdge_IR_Bestand" dmnElementRef="IR_Bestand"><di:waypoint x="165" y="300" /><di:waypoint x="420" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_IR_Verbrauch" dmnElementRef="IR_Verbrauch"><di:waypoint x="375" y="300" /><di:waypoint x="460" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_IR_Profil" dmnElementRef="IR_Profil"><di:waypoint x="585" y="300" /><di:waypoint x="520" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_IR_Intervall" dmnElementRef="IR_Intervall"><di:waypoint x="795" y="300" /><di:waypoint x="560" y="160" /></dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_AR_Auftrag" dmnElementRef="AR_Auftrag"><di:waypoint x="720" y="120" /><di:waypoint x="590" y="120" /></dmndi:DMNEdge>
+    <dmndi:DMNDiagram id="DMNDiagram_Nachversorgungsbedarf">
+      <dmndi:DMNShape id="DMNShape_Nachversorgungsbedarf" dmnElementRef="Nachversorgungsbedarf">
+        <dc:Bounds height="80" width="200" x="390" y="80" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Bestand" dmnElementRef="ID_Bestand">
+        <dc:Bounds height="55" width="170" x="80" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Verbrauch" dmnElementRef="ID_Verbrauch">
+        <dc:Bounds height="55" width="170" x="290" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Profil" dmnElementRef="ID_Profil">
+        <dc:Bounds height="55" width="170" x="500" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_ID_Intervall" dmnElementRef="ID_Intervall">
+        <dc:Bounds height="55" width="170" x="710" y="300" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_KS_Auftrag" dmnElementRef="KS_Auftrag">
+        <dc:Bounds height="63" width="140" x="720" y="88" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_IR_Bestand" dmnElementRef="IR_Bestand">
+        <di:waypoint x="165" y="300" />
+        <di:waypoint x="420" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_IR_Verbrauch" dmnElementRef="IR_Verbrauch">
+        <di:waypoint x="375" y="300" />
+        <di:waypoint x="460" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_IR_Profil" dmnElementRef="IR_Profil">
+        <di:waypoint x="585" y="300" />
+        <di:waypoint x="520" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_IR_Intervall" dmnElementRef="IR_Intervall">
+        <di:waypoint x="795" y="300" />
+        <di:waypoint x="560" y="160" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_AR_Auftrag" dmnElementRef="AR_Auftrag">
+        <di:waypoint x="720" y="120" />
+        <di:waypoint x="590" y="120" />
+      </dmndi:DMNEdge>
     </dmndi:DMNDiagram>
   </dmndi:DMNDI>
 </definitions>
-<!-- Ende des KI-generierten Teils -->
+<!-- Ende KI-generiert -->
