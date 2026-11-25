@@ -77,8 +77,6 @@
 <bpmn:sequenceFlow id="F22" sourceRef="GW_Lieferung" targetRef="SP_Abschluss" name="Lieferung abgeschlossen"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lieferpruefungErgebnis == 'Lieferung abgeschlossen'}</bpmn:conditionExpression></bpmn:sequenceFlow>
 <bpmn:sequenceFlow id="F23" sourceRef="GW_Lieferung" targetRef="End_Ungeklaert" name="Lieferung ungeklärt"><bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lieferpruefungErgebnis == 'Lieferung ungeklärt'}</bpmn:conditionExpression></bpmn:sequenceFlow>
 <bpmn:sequenceFlow id="F24" sourceRef="SP_Abschluss" targetRef="End_Abgeschlossen"></bpmn:sequenceFlow>
-<bpmn:textAnnotation id="A_Ersatz"><bpmn:text>Rückgabe an die Bestellfreigabe: ersatzGrund und anzahlBestellversuche. Die Obergrenze prüft die Bestellabwicklung ("Ersatzoption prüfen").</bpmn:text></bpmn:textAnnotation>
-<bpmn:association id="A_Ersatz_Assoc" associationDirection="None" sourceRef="F20" targetRef="A_Ersatz" />
 </bpmn:process>
 <bpmn:message id="Msg_Bestandsmeldung" name="PflegeApp_Bestandsmeldung_Team2" />
 <bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collab_T2_Materialversorgung">
@@ -120,8 +118,6 @@
 <bpmndi:BPMNShape id="SA_Ergebnis_di" bpmnElement="SA_Ergebnis" bioc:stroke="#616161" bioc:fill="#E0E0E0" color:background-color="#E0E0E0" color:border-color="#616161"><dc:Bounds x="3740" y="420" width="140" height="80" /></bpmndi:BPMNShape>
 <bpmndi:BPMNShape id="SA_End_di" bpmnElement="SA_End"><dc:Bounds x="3912" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3890" y="482" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
 <bpmndi:BPMNShape id="End_Abgeschlossen_di" bpmnElement="End_Abgeschlossen"><dc:Bounds x="4022" y="442" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="3995" y="482" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-<bpmndi:BPMNShape id="A_Ersatz_di" bpmnElement="A_Ersatz"><dc:Bounds x="1700" y="575" width="320" height="40" /></bpmndi:BPMNShape>
-<bpmndi:BPMNEdge id="A_Ersatz_Assoc_di" bpmnElement="A_Ersatz_Assoc"><di:waypoint x="1860" y="650" /><di:waypoint x="1860" y="615" /></bpmndi:BPMNEdge>
 <bpmndi:BPMNEdge id="F01_di" bpmnElement="F01"><di:waypoint x="308" y="460" /><di:waypoint x="355" y="460" /></bpmndi:BPMNEdge>
 <bpmndi:BPMNEdge id="F02_di" bpmnElement="F02"><di:waypoint x="380" y="348" /><di:waypoint x="380" y="435" /></bpmndi:BPMNEdge>
 <bpmndi:BPMNEdge id="F03_di" bpmnElement="F03"><di:waypoint x="218" y="610" /><di:waypoint x="380" y="610" /><di:waypoint x="380" y="485" /></bpmndi:BPMNEdge>
