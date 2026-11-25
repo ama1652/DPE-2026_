@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS t2_versorgungsprofil (
   mindestbestand         INT          NOT NULL,         -- Stück, Auslöser bedingter Start
   verbrauch_pro_tag      DECIMAL(6,2) NOT NULL,         -- Verbrauchsannahme (Stück/Tag)
   verbrauch_herkunft     VARCHAR(40)  NOT NULL,         -- 'konfiguriert' oder 'aus Testdaten abgeleitet'
-  preisgrenze_packung    DECIMAL(8,2) NOT NULL,         -- darüber Kundenfreigabe
+  preisgrenze            DECIMAL(8,2) NOT NULL,         -- Gesamtpreis je Bestellung, darüber Kundenfreigabe (DMN: preisGesamt > preisgrenze)
   pruefintervall_tage    INT          NOT NULL,         -- Timer-Start R/P10D
   FOREIGN KEY (pflegehaushalt_id) REFERENCES t2_pflegehaushalt(id),
   FOREIGN KEY (produkt_id)        REFERENCES t2_produkt(id),
@@ -107,9 +107,9 @@ INSERT INTO t2_produkt VALUES
   ('TP-M-PLUS', 'Testprodukt M Plus', 'Inkontinenzmaterial', 30, 26.40, TRUE, 'LF-0001');  -- hinterlegte Ersatzoption
 
 -- Annahmen: Zielbestand 120 Stück (4 Packungen), Mindestbestand 40, Verbrauch 4 Stück/Tag,
--- Preisgrenze 25,00 € je Packung, Prüfung alle 10 Tage (Beispiel von Stiehl).
+-- Preisgrenze 75,00 € je Bestellung (= 3 Packungen à 25,00 €), Prüfung alle 10 Tage (Beispiel von Stiehl).
 INSERT INTO t2_versorgungsprofil VALUES
-  ('VP-0001', 'PH-0001', 'TP-M', 'TP-M-PLUS', 120, 40, 4.00, 'konfiguriert', 25.00, 10);
+  ('VP-0001', 'PH-0001', 'TP-M', 'TP-M-PLUS', 120, 40, 4.00, 'konfiguriert', 75.00, 10);
 
 -- Ausgangsbestand für den Happy Path (TF01): 30 Stück < Mindestbestand 40
 INSERT INTO t2_bestand (pflegehaushalt_id, produkt_id, menge, zeitpunkt, herkunft) VALUES
@@ -121,6 +121,10 @@ INSERT INTO t2_bestand (pflegehaushalt_id, produkt_id, menge, zeitpunkt, herkunf
 --   Reichweite = Ist-Bestand / Verbrauch pro Tag
 --   nachbestellen, wenn Reichweite < Prüfintervall (10) + Lieferzeit (3) = 13 Tage
 -- Bestellmenge = Zielbestand - Ist-Bestand, aufgerundet auf volle Packung (30 Stück)
+-- Freigabeweg (DMN "Berechtigungsregel", Hit Policy FIRST): Produkt nicht hinterlegt oder
+--   Verbrauchssprung -> PRUEFUNG; Gesamtpreis > 75,00 €, Ersatzprodukt, anderer Lieferant oder
+--   Menge > Zielbestand -> KUNDENFREIGABE; sonst AUTOMATISCH
+-- Beispiel TF01: 120 - 30 = 90 Stück = 3 Packungen x 24,90 € = 74,70 € <= 75,00 € -> AUTOMATISCH
 -- Business Key je Vorgang: PH-0001:TP-M
 -- ---------------------------------------------------------------------
 INSERT INTO t2_testfall VALUES
@@ -136,7 +140,7 @@ INSERT INTO t2_testfall VALUES
   25, 4.00, 24.90, TRUE, TRUE,
   'TF01 wartet noch auf Lieferant; dann Nachricht PflegeApp_Bestandsmeldung_Team2',
   'Vorgang bereits offen', '-'),
-('TF04','Preis über Grenze, Kunde gibt frei',
+('TF04','Preis über Grenze (3 x 27,50 € = 82,50 € > 75,00 €), Kunde gibt frei',
   30, 4.00, 27.50, TRUE, TRUE,
   'Pflege-App entscheidung=FREIGEBEN; Lieferant BESTAETIGT; lieferbefund=RICHTIG',
   'Nachversorgung abgeschlossen', 'Erfolgreich abgeschlossen'),
@@ -156,17 +160,17 @@ INSERT INTO t2_testfall VALUES
   30, 4.00, 27.50, TRUE, TRUE,
   'Pflege-App entscheidung=AENDERN, 3-mal',
   'Bestellung nicht freigegeben', 'Erfolglos abgeschlossen'),
-('TF09','Grenzfall (ungeklärtes Produkt), Prüfstelle: nicht zulässig',
+('TF09','Grenzfall: Produkt nicht im Versorgungsprofil hinterlegt, Prüfstelle: nicht zulässig',
   30, 4.00, 24.90, TRUE, TRUE,
-  'Berechtigungsregel freigabeweg=PRUEFUNG; Prüfstelle pruefergebnis=NICHT_ZULAESSIG',
+  'produktHinterlegt=false -> freigabeweg=PRUEFUNG; Prüfstelle pruefergebnis=NICHT_ZULAESSIG',
   'Bestellung nicht zulässig', 'Erfolglos abgeschlossen'),
-('TF10','Verbrauch deutlich verändert (4 -> 12 Stück/Tag), Kunde gibt frei',
+('TF10','Verbrauch deutlich verändert (4 -> 12 Stück/Tag), Prüfstelle holt Kundenfreigabe ein, Kunde gibt frei',
   30, 12.00, 24.90, TRUE, TRUE,
-  'verbrauchssprung=true -> freigabeweg=KUNDENFREIGABE; entscheidung=FREIGEBEN; Lieferant BESTAETIGT; lieferbefund=RICHTIG',
+  'verbrauchssprung=true -> freigabeweg=PRUEFUNG; Prüfstelle pruefergebnis=KUNDENFREIGABE; entscheidung=FREIGEBEN; Lieferant BESTAETIGT; lieferbefund=RICHTIG',
   'Nachversorgung abgeschlossen', 'Erfolgreich abgeschlossen'),
 ('TF11','Produkt nicht verfügbar, Ersatz hinterlegt -> 2. Versuch mit Testprodukt M Plus',
   30, 4.00, 24.90, FALSE, TRUE,
-  'Lieferant 1. Versuch NICHT_VERFUEGBAR; Ersatz 26,40 € > Grenze -> entscheidung=FREIGEBEN; Lieferant 2. Versuch BESTAETIGT; lieferbefund=RICHTIG',
+  'Lieferant 1. Versuch NICHT_VERFUEGBAR; Ersatzprodukt (3 x 26,40 € = 79,20 €) -> KUNDENFREIGABE; entscheidung=FREIGEBEN; Lieferant 2. Versuch BESTAETIGT; lieferbefund=RICHTIG',
   'Nachversorgung abgeschlossen', 'Erfolgreich abgeschlossen'),
 ('TF12','Produkt nicht verfügbar, kein Ersatz hinterlegt',
   30, 4.00, 24.90, FALSE, FALSE,

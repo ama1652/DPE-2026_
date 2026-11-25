@@ -39,7 +39,7 @@ Die Frist von 3 Tagen ist eine **Projektannahme** (nicht von Stiehl vorgegeben).
 | `pflegehaushaltId` | String | ja | Gemeinsamer Pflegehaushalt (Integrationspaket 6.2) | `PH-0001` |
 | `vorgangId` | String | ja | Vorgang des aufrufenden Teams, dient auch zur Korrelation der Antwort | `VG-T2-0001` |
 | `freigabeHandlung` | String | ja | Was soll freigegeben werden? | `Bestellung 3 × Testprodukt M à 27,50 € = 82,50 €` |
-| `freigabeBegruendung` | String | ja | Warum ist eine Freigabe nötig? | `Preis über Freigabegrenze 25,00 € (+2,50 € je Packung)` |
+| `freigabeBegruendung` | String | ja | Warum ist eine Freigabe nötig? | `Gesamtpreis 82,50 € über der Freigabegrenze von 75,00 €` |
 | `freigabeFolgen` | String | ja | Was passiert bei Ablehnung oder Aufschub? | `Bestand reicht noch ca. 7 Tage (Reichweitenrisiko)` |
 | `freigabeGueltigBis` | Datum (ISO 8601) | nein | Bis wann gilt das Angebot? | `2026-12-01` |
 

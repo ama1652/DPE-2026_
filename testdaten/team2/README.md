@@ -18,10 +18,10 @@ mysql -u <user> -p <datenbank> < testdaten/team2/T2_Testdaten.sql
 | Lieferant | `LF-0001` Versorgungsdienst Beispiel, Lieferzeit 3 Tage *(Annahme)* |
 | Produkt | `TP-M` Testprodukt M, Inkontinenzmaterial, 30 Stück je Packung, 24,90 € *(Annahme)* |
 | Ersatzoption | `TP-M-PLUS` Testprodukt M Plus, 26,40 € *(hinterlegt, kein medizinischer Ersatz)* |
-| Versorgungsprofil | Zielbestand 120 · Mindestbestand 40 · Verbrauch 4 Stück/Tag · Preisgrenze 25,00 €/Packung · Prüfung alle 10 Tage |
+| Versorgungsprofil | Zielbestand 120 · Mindestbestand 40 · Verbrauch 4 Stück/Tag · Preisgrenze 75,00 € je Bestellung · Prüfung alle 10 Tage |
 | Business Key | `PH-0001:TP-M` |
 
-**Rechenregel (Annahme für die DMN „Nachversorgungsbedarf“):** nachbestellen, wenn Reichweite = Ist-Bestand ÷ Verbrauch < 10 + 3 = 13 Tage. Bestellmenge = Zielbestand − Ist-Bestand, aufgerundet auf volle Packung.
+**Rechenregel (Annahme für die DMN „Nachversorgungsbedarf“):** nachbestellen, wenn Reichweite = Ist-Bestand ÷ Verbrauch < 10 + 3 = 13 Tage. Bestellmenge = Zielbestand − Ist-Bestand, aufgerundet auf volle Packung. Den Freigabeweg bestimmt Mohammeds DMN „Berechtigungsregel“ ([DMN.md](../../prozesse/team2/DMN.md)): Produkt nicht hinterlegt oder Verbrauchssprung → Prüfstelle; Gesamtpreis > 75 €, Ersatzprodukt, anderer Lieferant oder Menge > Zielbestand → Kundenfreigabe; sonst automatisch.
 
 ## Testfälle – jeder Endzustand des Hauptprozesses kommt vor
 
@@ -30,13 +30,13 @@ mysql -u <user> -p <datenbank> < testdaten/team2/T2_Testdaten.sql
 | TF01 | Happy Path (30 Stück, Preis unter Grenze) | Lieferant bestätigt, Lieferung richtig | Nachversorgung abgeschlossen | Erfolgreich abgeschlossen |
 | TF02 | Bestand reicht (110 Stück = 27,5 Tage) | – | Bestand ausreichend | – |
 | TF03 | Zweiter Start während TF01 läuft | manuelle Bestandsmeldung | Vorgang bereits offen | – |
-| TF04 | Preis über Grenze (27,50 €) | Kunde: FREIGEBEN | Nachversorgung abgeschlossen | Erfolgreich abgeschlossen |
+| TF04 | Preis über Grenze (3 × 27,50 € = 82,50 €) | Kunde: FREIGEBEN | Nachversorgung abgeschlossen | Erfolgreich abgeschlossen |
 | TF05 | Preis über Grenze | Kunde: ABLEHNEN | Bestellung nicht freigegeben | Erfolglos abgeschlossen |
 | TF06 | Preis über Grenze | Kunde: AUFSCHIEBEN | Bestellung aufgeschoben | Erfolglos abgeschlossen |
 | TF07 | Preis über Grenze | keine Antwort, Nachfassen Team 3, wieder keine | Bestellung nicht freigegeben | Erfolglos abgeschlossen |
 | TF08 | Preis über Grenze | Kunde: 3× AENDERN | Bestellung nicht freigegeben | Erfolglos abgeschlossen |
-| TF09 | Grenzfall | Prüfstelle: NICHT_ZULAESSIG | Bestellung nicht zulässig | Erfolglos abgeschlossen |
-| TF10 | Verbrauch 4 → 12 Stück/Tag | Kunde: FREIGEBEN | Nachversorgung abgeschlossen | Erfolgreich abgeschlossen |
+| TF09 | Produkt nicht im Profil hinterlegt | Prüfstelle: NICHT_ZULAESSIG | Bestellung nicht zulässig | Erfolglos abgeschlossen |
+| TF10 | Verbrauch 4 → 12 Stück/Tag | Prüfstelle: Kundenfreigabe einholen, Kunde: FREIGEBEN | Nachversorgung abgeschlossen | Erfolgreich abgeschlossen |
 | TF11 | Produkt nicht verfügbar, Ersatz hinterlegt | Ersatz freigegeben, 2. Versuch bestätigt | Nachversorgung abgeschlossen | Erfolgreich abgeschlossen |
 | TF12 | Produkt nicht verfügbar, kein Ersatz | – | Keine Bestellung möglich | Erfolglos abgeschlossen |
 | TF13 | Lieferant antwortet nicht, kein Ersatz | Nachfassen Team 3, wieder keine Antwort | Keine Bestellung möglich | Erfolglos abgeschlossen |
