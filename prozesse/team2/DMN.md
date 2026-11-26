@@ -1,6 +1,6 @@
 # Team 2 – Entscheidungstabellen (DMN)
 
-> **KI-Kennzeichnung (Kursregel):** Entwurf mit KI-Unterstützung (Claude, Anthropic), muss von Team 2 geprüft werden. Verantwortlich im Team: Mohammed (T2-07, T2-09).
+> **KI-Kennzeichnung (Kursregel):** Entwurf mit KI-Unterstützung (Claude, Anthropic), muss von Team 2 geprüft werden. Verantwortlich im Team: Saifudin (T2-09, übernommen am 27.11.2026; erste Fassung von Mohammed).
 >
 > **Stand:** 24.11.2026. Getestet in einer Camunda-7.22-Engine im Speicher (Basis von CIB seven), siehe [Test](#test).
 
