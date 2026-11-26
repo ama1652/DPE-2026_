@@ -98,9 +98,7 @@
 | T2-26 | Pitch (15 Minuten): Problem, Lösung, Wow-Demo, Geschäftsmodell, Zukunft, je Person ein Teil | 5 |
 | T2-27 | Abgabe: Code + Datenbankabzug an Stiehl, Fehlerliste, Lizenzhinweise | 2 |
 
-## Saifudins Paket (das leichteste) in Kurzform
-1. **T2-11 Benachrichtigungs-Worker:** ein External-Task-Worker, der die Topics für Anfragen und Ergebnis abholt und die Nachricht ins „App-Postfach“ schreibt. Wenig Logik, gut erklärbar.
-2. **T2-13 Schnittstelle Kundenentscheidung:** Vorlage D ausfüllen, die Inhalte stehen schon in der README.
-3. **T2-19 Testdaten:** ein SQL-Skript.
-4. **T2-20 Startanleitung:** aufschreiben, was die anderen einrichten.
-5. **T2-22 BPMN pflegen:** kennst du schon.
+## Saifudins Paket seit 27.11. in Kurzform
+1. **Schon geliefert (PR #30, #32):** Testdaten (T2-19), Vorlage D Kundenentscheidung (T2-13), Benachrichtigungs-Worker (T2-11), Projektstruktur (T2-02), Prozesslogik-Worker (T2-07, T2-08, T2-10), Endzustand-Test (Teil von T2-06).
+2. **DMN (T2-09):** erste Fassung von Mohammed, liegt in `prozesse/team2`. Pflegen und mit `werkzeuge/dmn-test` testen.
+3. **Noch offen:** lokal `mvn test` für alle Tests, Deploy auf CIB seven (T2-06), Startanleitung (T2-20), BPMN pflegen (T2-22).
