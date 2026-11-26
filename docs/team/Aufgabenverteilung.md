@@ -2,7 +2,7 @@
 
 > **KI-Kennzeichnung:** Vorschlag erstellt mit Claude (Anthropic) auf Basis von Projektvorgaben, Teamauftrag 2, Projekthandbuch (Kap. 9) und Integrationspaket (Kap. 3, Vorlagen A/B). Vom Team zu bestätigen.
 >
-> **Stand:** 22.11.2026 · **Nächster Meilenstein:** 14.12.2026
+> **Stand:** 27.11.2026 (Mohammeds Pakete T2-02, 06, 07, 08, 10 an Saifudin übergeben, weil bis dahin kein Commit dazu kam) · **Nächster Meilenstein:** 14.12.2026
 
 ## Warum so verteilt (Vorgaben von Stiehl)
 - **Prüfungsamt:** Jedes Teammitglied verantwortet einen **eigenen, substanziellen Code-Anteil**. Der **gesamte Code** wird aufgeteilt. Wer welchen Code verantwortet, steht **als Kommentar im Code** (Projektvorgaben A).
@@ -14,10 +14,10 @@
 ## Bisher erledigt
 | Person | Erledigt |
 |---|---|
-| Saifudin | Unterlagen gesammelt, Repo aufgebaut, komplettes BPMN-Modell (5 Dateien), Doku und Modell-Erklärung, Meilenstein-Vorstellung, Umbau nach Stiehls Feedback |
+| Saifudin | Unterlagen gesammelt, Repo aufgebaut, komplettes BPMN-Modell (5 Dateien), Doku und Modell-Erklärung, Meilenstein-Vorstellung, Umbau nach Stiehls Feedback (3 Runden), Testdaten (#19), Schnittstelle Kundenentscheidung (#13), Benachrichtigungs-Worker (#11), **Mohammeds Pakete #2, #6, #7, #8, #10 übernommen** (PR #32) |
 | Amar | Layout-Skript für die BPMN-Bilder, Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
 | Erion | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
-| Mohammed | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
+| Mohammed | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell, DMN „Nachversorgungsbedarf“ und „Berechtigungsregel“ mit DMN-Test (#9) |
 
 **Folge:** Bis zum 14.12. übernehmen **Amar und Mohammed die beiden schwersten Pakete**, danach Erion. Reihenfolge nach Schwierigkeit: Amar (26 Punkte), Mohammed (21), Erion (16), Saifudin (13, kleinstes Paket).
 
@@ -28,8 +28,8 @@ Die Aufgaben stehen als User Stories mit Akzeptanzkriterien, Punkten und Sprint 
 |---|---|---|---|---|
 | **Amar** | Integration (Technik) | Messaging, Integration und Eventing: ActiveMQ, Camel (CBR, XML↔JSON), Lieferant-Simulation, Stubs für Team 3, **Esper** | T2-14 bis T2-18 | 26 |
 | **Erion** | Technische Umsetzung | Persistenz (JPA/Panache Repository-Stil, MySQL), REST für die Pflege-App-Simulation, bedingter Start | T2-03, 04, 05, 12 | 16 |
-| **Mohammed** | Prozesslogik | External-Task-Worker, DMN „Nachversorgungsbedarf“ und „Berechtigungsregel“, Deploy auf CIB seven, Projektstruktur | T2-02, 06, 07, 08, 09, 10 | 21 |
-| **Saifudin** | Prozess und Fachlichkeit, Integrationskreis | Benachrichtigungs-Worker, Schnittstelle Kundenentscheidung, Testdaten, Startanleitung, BPMN pflegen | T2-11, 13, 19, 20, 22 | 13 |
+| **Mohammed** | Prozesslogik | DMN „Nachversorgungsbedarf“ und „Berechtigungsregel“ | T2-09 | 5 |
+| **Saifudin** | Prozess und Fachlichkeit, Integrationskreis, Prozesslogik | Benachrichtigungs-Worker, Schnittstelle Kundenentscheidung, Testdaten, Startanleitung, BPMN pflegen; **übernommen am 27.11.:** Projektstruktur, Worker der Prozesslogik, Deploy- und Endzustand-Test | T2-02, 06, 07, 08, 10, 11, 13, 19, 20, 22 | 29 |
 
 **Vertretungen:** Amar ↔ Erion (beide arbeiten an den Nachrichten zur Engine), Mohammed ↔ Saifudin (Prozess und Worker).
 
