@@ -4,7 +4,7 @@
 >
 > **Aufgabenbrett:** jede Story ist ein [GitHub Issue](https://github.com/mohammadisaifuddin187-dev/DPE-2026_/issues) mit gleicher Nummer (T2-05 = #5), Labels `epic: …` / `wer: …`, Meilenstein = Sprint.
 >
-> **Stand:** 22.11.2026 (an Stiehls 11 Punkte angepasst) · Format wie in TerraMax: *Als … möchte ich …, damit …* + Akzeptanzkriterien. Punkte nach Fibonacci (1, 2, 3, 5, 8).
+> **Stand:** 27.11.2026 (Mohammeds Stories T2-02, 06–10 an Saifudin übergeben) · Format wie in TerraMax: *Als … möchte ich …, damit …* + Akzeptanzkriterien. Punkte nach Fibonacci (1, 2, 3, 5, 8).
 
 ## Sprints
 
@@ -20,8 +20,8 @@
 |---|---|---|
 | **Amar** | Messaging, Integration und Eventing (Camel, ActiveMQ, Lieferant-Simulation, Esper) | 26 |
 | **Erion** | Persistenz, REST, Pflege-App-Simulation, bedingter Start | 16 |
-| **Mohammed** | External-Task-Worker, DMN, Deploy auf CIB seven | 21 |
-| **Saifudin** | Benachrichtigung, Testdaten, Doku, Schnittstelle Kundenentscheidung, BPMN | 13 *(bewusst am kleinsten, weil er BPMN und Doku bis zum Meilenstein 1 allein gemacht hat)* |
+| **Mohammed** | – (erste Fassung der DMN geliefert, Stories am 27.11. an Saifudin übergeben) | 0 |
+| **Saifudin** | Benachrichtigung, Testdaten, Doku, Schnittstelle Kundenentscheidung, BPMN; **seit 27.11. auch** External-Task-Worker, DMN, Deploy auf CIB seven | 34 |
 
 ## Definition of Done (für jede Story)
 - Der Code liegt im Repo und hat den Kommentar `// Verantwortlich: <Name>`. Der KI-Anteil ist mit Beginn, Ende und Werkzeug gekennzeichnet (Projektvorgaben).
@@ -36,7 +36,7 @@
 | ID | Story | Akzeptanzkriterien | Pkt | Wer | Sprint |
 |---|---|---|---|---|---|
 | T2-01 | Als **Entwicklerteam** möchten wir eine gemeinsame lokale Umgebung (JDK 17, Quarkus, CIB seven, ActiveMQ Classic, MySQL), damit alle Komponenten zusammen laufen. | Alle 4 starten die Umgebung nach derselben Anleitung · Versionen stehen in der README | 3 | **alle** | S1 |
-| T2-02 | Als **Entwicklerteam** möchten wir eine Projektstruktur im Repo (Quarkus-Module je Komponente), damit niemand im Code des anderen arbeitet. | Module `persistenz`, `worker`, `integration`, `eventing` · Build läuft | 2 | Mohammed | S1 |
+| T2-02 | Als **Entwicklerteam** möchten wir eine Projektstruktur im Repo (Quarkus-Module je Komponente), damit niemand im Code des anderen arbeitet. | Module `persistenz`, `worker`, `integration`, `eventing` · Build läuft | 2 | Saifudin | S1 |
 
 ## Epic E2 – Bestand und Versorgungsprofil (Persistenz)
 
@@ -50,11 +50,11 @@
 
 | ID | Story | Akzeptanzkriterien | Pkt | Wer | Sprint |
 |---|---|---|---|---|---|
-| T2-06 | Als **Entwicklerteam** möchten wir alle 5 BPMN-Dateien auf CIB seven deployen, damit wir das Modell testen können. | Deploy ohne Fehler · Instanz startet im Cockpit | 2 | Mohammed | S1 |
-| T2-07 | Als **Backoffice** möchte ich, dass Verbrauch und Reichweite berechnet werden und die Regel den Bedarf feststellt, damit rechtzeitig nachbestellt wird. | Worker `t2-reichweite-berechnen` · **DMN „Nachversorgungsbedarf“** setzt `nachversorgungErforderlich` · Worker `t2-vorgang-pruefen` (laufende Instanz mit Business Key `PH-<Haushalt>:<Produkt>` suchen, setzt `vorgangOffen`) | 5 | Mohammed | S1 |
-| T2-08 | Als **Backoffice** möchte ich einen Bestellvorschlag (Menge = Zielbestand − Ist-Bestand, aufgerundet auf die Packung) und eine Ersatzprüfung, damit nur Abweichungen zum Menschen gehen und die Ersatz-Schleife endet. | Worker `t2-vorschlag-erstellen`, `t2-ersatzoption-pruefen` (setzt `ersatzMoeglich`, höchstens 2 Bestellversuche) · Abweichungen ermittelt die DMN „Berechtigungsregel“ | 5 | Mohammed | S2 |
-| T2-09 | Als **Team 1, 2 und 3** möchten wir eine gemeinsame **Berechtigungsregel**, damit überall gleich entschieden wird, was ohne Freigabe erlaubt ist. | **DMN „Berechtigungsregel“** → `AUTOMATISCH` / `KUNDENFREIGABE` / `PRUEFUNG` · ermittelt die Abweichungen (Preis, Produktwechsel, Verbrauchssprung, Lieferant, Menge) · Quelle oder „Projektannahme“ je Regel | 5 | Mohammed | S2 |
-| T2-10 | Als **Backoffice** möchte ich, dass nach der Lieferung der Bestand fortgeschrieben wird. | Worker `t2-bestand-fortschreiben` schreibt in die DB (nutzt Repository von T2-03) | 2 | Mohammed | S2 |
+| T2-06 | Als **Entwicklerteam** möchten wir alle 5 BPMN-Dateien auf CIB seven deployen, damit wir das Modell testen können. | Deploy ohne Fehler · Instanz startet im Cockpit | 2 | Saifudin | S1 |
+| T2-07 | Als **Backoffice** möchte ich, dass Verbrauch und Reichweite berechnet werden und die Regel den Bedarf feststellt, damit rechtzeitig nachbestellt wird. | Worker `t2-reichweite-berechnen` · **DMN „Nachversorgungsbedarf“** setzt `nachversorgungErforderlich` · Worker `t2-vorgang-pruefen` (laufende Instanz mit Business Key `PH-<Haushalt>:<Produkt>` suchen, setzt `vorgangOffen`) | 5 | Saifudin | S1 |
+| T2-08 | Als **Backoffice** möchte ich einen Bestellvorschlag (Menge = Zielbestand − Ist-Bestand, aufgerundet auf die Packung) und eine Ersatzprüfung, damit nur Abweichungen zum Menschen gehen und die Ersatz-Schleife endet. | Worker `t2-vorschlag-erstellen`, `t2-ersatzoption-pruefen` (setzt `ersatzMoeglich`, höchstens 2 Bestellversuche) · Abweichungen ermittelt die DMN „Berechtigungsregel“ | 5 | Saifudin | S2 |
+| T2-09 | Als **Team 1, 2 und 3** möchten wir eine gemeinsame **Berechtigungsregel**, damit überall gleich entschieden wird, was ohne Freigabe erlaubt ist. | **DMN „Berechtigungsregel“** → `AUTOMATISCH` / `KUNDENFREIGABE` / `PRUEFUNG` · ermittelt die Abweichungen (Preis, Produktwechsel, Verbrauchssprung, Lieferant, Menge) · Quelle oder „Projektannahme“ je Regel | 5 | Saifudin | S2 |
+| T2-10 | Als **Backoffice** möchte ich, dass nach der Lieferung der Bestand fortgeschrieben wird. | Worker `t2-bestand-fortschreiben` schreibt in die DB (nutzt Repository von T2-03) | 2 | Saifudin | S2 |
 
 ## Epic E4 – Pflege-App und Benachrichtigung (gemeinsame Funktion)
 
