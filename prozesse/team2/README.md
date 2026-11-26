@@ -10,7 +10,7 @@
 
 | Datei | Inhalt | Teamauftrag-Schritte |
 |---|---|---|
-| `T2_Materialversorgung.bpmn` | **Hauptprozess:** 3 Starts, Prüfung auf offenen Vorgang, Bedarfsermittlung und Vorgangsabschluss aufgeklappt eingebettet, 3 Call Activities, 8 Endzustände | 1–12 |
+| `T2_Materialversorgung.bpmn` | **Hauptprozess:** 3 Starts, Prüfung auf offenen Vorgang, Bedarf (DMN) und Abschluss direkt im Fluss, 3 Call Activities, 8 Endzustände | 1–12 |
 | `T2_Bestellfreigabe.bpmn` | Vorschlag, Berechtigungsregel (DMN), Kundenentscheidung oder Prüfstelle, 4 Ergebnisse | 4–7 |
 | `T2_Kundenentscheidung.bpmn` | **Gemeinsamer Baustein** für Team 1, 2 und 3 (Senden/Empfangen über die Pflege-App, Nachfassen über Team 3) | 7 |
 | `T2_Bestellabwicklung.bpmn` | Bestellung senden (JMS), Antwort empfangen, Nachfassen über Team 3, Ersatzoption prüfen | 8–9 |
@@ -21,6 +21,18 @@
 Eine Instanz entspricht einem Nachversorgungsvorgang für ein Produkt eines Pflegehaushalts, **Business Key `PH-<Haushalt>:<Produkt>`**. Den Ist-Bestand führt Team 2 selbst in der eigenen Datenbank (führendes System).
 
 ![Hauptprozess](bilder/T2_Materialversorgung.png)
+
+## Runde 3: Besprechung mit Stiehl (25.11.2026)
+
+Ergebnis: alle 11 Punkte besprochen, **grünes Licht** für das Deployment.
+
+| Hinweis von Stiehl | Jetzt im Modell | Team 1/3 betroffen? |
+|---|---|---|
+| Ein eingebetteter Teilprozess lohnt sich nur bei Schleifenmarkierung, Boundary-Event oder komplexer Logik. | **Bedarfsermittlung** (2 Schritte) und **Vorgangsabschluss** (3 Schritte) liegen jetzt direkt im Hauptfluss. Die IDs der Schritte sind gleich geblieben. | Nein |
+| Am verzweigenden XOR: ein Weg waagerecht, die anderen nach unten rechts bzw. oben rechts, Beschriftung auf dem waagerechten Teil. Keine zwei Flüsse aus einer Ecke. | Umgesetzt in Hauptprozess, Bestellfreigabe und Kundenentscheidung. Im Hauptprozess gehen die Abbruch-Enden treppenförmig nach oben rechts ab, damit sich nichts mit den Nachrichtenflüssen kreuzt. | Nein |
+| Endereignisse am rechten Rand untereinander. | Umgesetzt in Bestellfreigabe, Kundenentscheidung, Bestellabwicklung und Lieferprüfung. Ausnahme: „Bestellung nicht zulässig“ bleibt in der Prüfstellen-Bahn (sonst Kreuzung mit der Schleife). | Nein |
+| „Vorgang bereits offen“ ohne Nachricht an die App. | bleibt so (bestätigt) | Nein |
+| DMN Hit Policy FIRST statt UNIQUE | bleibt FIRST, „wenn ihr euch der Konsequenzen bewusst seid“; AUTOMATISCH ist der Auffangfall | Nein |
 
 ## Runde 2: Schriftliche Rückmeldung von Stiehl (22.11.2026)
 
@@ -55,7 +67,7 @@ Kernaussage von Stiehl: *Die Pflege-App ist ein eigenständiges System. Mit ihr 
 | 5 | Mitteilungen sind Sendenachrichten | Alle Mitteilungen an die App als Senden |
 | 6 | Quittung verlangen? | Damals Kenntnisnahme mit Nachfassen; in Runde 2 durch „Ergebnis“-Nachricht ersetzt |
 | 7 | Happy Path: Empfangen mit angehängtem Timer | In Bestellabwicklung, Kundenentscheidung, Lieferprüfung |
-| 8 | Wenige Schritte eingebettet und aufgeklappt | Bedarfsermittlung und Vorgangsabschluss eingebettet |
+| 8 | Wenige Schritte eingebettet und aufgeklappt | damals eingebettet; seit Runde 3 direkt im Fluss |
 
 ## Prozessgrenze
 - **Start (3 Auslöser laut Teamauftrag):**
@@ -94,7 +106,7 @@ Die Zuordnung zu den Zuständen ist ein Vorschlag für den Integrationskreis.
 
 ## Umgesetzte Best Practices (Stiehl, Method & Style)
 - **Führendes System entscheidet den Aufgabentyp:** Eigene Daten → Service- und Regelaufgaben. Fremde Systeme (Pflege-App, Lieferant, Team 1, Team 3) → Senden und Empfangen.
-- **Top-down:** Hauptprozess mit höchstens 10 Aktivitäten. Große Teilprozesse als Call Activity (Call by Value), kleine eingebettet und aufgeklappt.
+- **Top-down:** Hauptprozess mit höchstens 10 Aktivitäten. Große Teilprozesse als Call Activity (Call by Value); wenige Schritte direkt im Fluss (Runde 3).
 - **Label-Matching (Regeln 10–12):** Endereignisse jedes Teilprozesses heißen genau wie die Ausgänge des folgenden Gateways. Jedes Endereignis setzt per Execution Listener `<teilprozess>Ergebnis = '<Name>'`.
 - **Teilprozess-Enden steuern nicht, Daten steuern (Punkt 8, Regel 20):** Vor jedem Gateway liegt eine Aufgabe oder Regel, die das Ergebnis erzeugt.
 - **Nachrichtenflüsse** in Eltern- und Kindebene gleich beschriftet (Regel 14), jede Sende-/Empfangsaufgabe hat einen Nachrichtenfluss (Regel 13), Partner sind Blackbox-Pools.

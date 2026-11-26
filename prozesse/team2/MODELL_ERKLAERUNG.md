@@ -18,7 +18,7 @@
 
 | Datei | Rolle | Teamauftrag-Schritte |
 |---|---|---|
-| `T2_Materialversorgung.bpmn` | **Hauptprozess:** 3 Starts; Prüfung auf offenen Vorgang; Bedarfsermittlung und Vorgangsabschluss aufgeklappt eingebettet; 3 Call Activities | 1–12 |
+| `T2_Materialversorgung.bpmn` | **Hauptprozess:** 3 Starts; Prüfung auf offenen Vorgang; Bedarf (DMN) und Abschluss direkt im Fluss; 3 Call Activities | 1–12 |
 | `T2_Bestellfreigabe.bpmn` | Vorschlag, Berechtigungsregel (DMN), Kundenentscheidung oder Prüfstelle | 4–7 |
 | `T2_Kundenentscheidung.bpmn` | **Gemeinsamer Baustein** für Team 1, 2 und 3 | 7 |
 | `T2_Bestellabwicklung.bpmn` | Bestellung per JMS senden, Antwort empfangen, über Team 3 nachfassen, Ersatzoption prüfen | 8–9 |
@@ -43,7 +43,7 @@ Was sich nach dem Feedback geändert hat, steht in der README unter [Runde 2](RE
 **Ablauf:**
 1. Ein **sammelndes XOR** führt die 3 Startwege zusammen.
 2. **„Laufenden Vorgang prüfen“** (Service-Aufgabe): Gibt es schon eine Instanz mit dem Business Key `PH-<Haushalt>:<Produkt>`? Wenn ja → Ende „Vorgang bereits offen“. So kann ein zweiter Start nicht doppelt bestellen (Stiehl Punkt 2).
-3. **Bedarfsermittlung** (eingebettet, aufgeklappt):
+3. **Bedarf feststellen** (direkt im Fluss, seit der Besprechung am 25.11. kein Teilprozess mehr):
    - „Verbrauch und Reichweite berechnen“ liest den Ist-Bestand aus der Datenbank.
    - Regelaufgabe „Nachversorgungsbedarf feststellen“: Die Engine wertet die DMN direkt aus (`decisionRef`), siehe [DMN.md](DMN.md).
    - **Ein** Ende „Bedarf ermittelt“. Der Teilprozess liefert nur Daten (`nachversorgungErforderlich`). Entschieden wird erst am Gateway danach (Stiehl Punkt 8). Bei „Nein“ → Ende „Bestand ausreichend“. Einen Folgetermin setzt niemand, das macht der zyklische Timer (Punkt 1).
@@ -56,14 +56,14 @@ Was sich nach dem Feedback geändert hat, steht in der README unter [Runde 2](RE
    - „Ersatz erforderlich“ → unten zurück zum XOR vor der Bestellfreigabe, mit `ersatzGrund` und `anzahlBestellversuche`
    - „Keine Bestellung möglich“ → Nachrichten-Endereignis „Ergebnis“
 7. **Lieferprüfung** endet mit „Lieferung abgeschlossen“ → weiter, oder „Lieferung ungeklärt“ → Nachrichten-Endereignis „Ergebnis“ (an die Prüfstelle übergeben).
-8. **Vorgangsabschluss** (eingebettet, aufgeklappt): Bestand fortschreiben, Liefernachweis an Team 1, Ergebnis an die Pflege-App, danach Ende „Nachversorgung abgeschlossen“.
+8. **Abschluss** (direkt im Fluss): Bestand fortschreiben, Liefernachweis an Team 1, Ergebnis an die Pflege-App, danach Ende „Nachversorgung abgeschlossen“.
 
 **Warum wird der Bestand nur im Erfolgsfall fortgeschrieben?** (Stiehl Punkt 3) Ohne Lieferung ändert sich der Bestand nicht. Fortgeschrieben wird bei jedem Abbruch aber der **Vorgang** (Zustand und Grund), und zwar im Worker des Nachrichten-Endereignisses `t2-ergebnis-mitteilen`.
 
 **Label-Matching (Stiehl, Regeln 10–12):** Jedes Endereignis eines Teilprozesses setzt per Execution Listener eine Ergebnisvariable mit seinem eigenen Namen, z. B. `bestellfreigabeErgebnis = 'Bestellung aufgeschoben'`. Das Gateway danach prüft genau diesen Text.
 
-**Warum eingebettet und Call Activity gemischt?** Stiehls Tipp lautet:
-- **Wenige Schritte** werden eingebettet und **aufgeklappt** (Bedarfsermittlung: 2 Schritte; Vorgangsabschluss: 3 Schritte).
+**Warum kein eingebetteter Teilprozess mehr?** Stiehl in der Besprechung am 25.11.: Ein Teilprozess lohnt sich nur bei Schleifenmarkierung, Boundary-Event oder komplexer Logik. Frühere Regel:
+- **Wenige Schritte** werden eingebettet und **aufgeklappt** (bei uns nicht mehr verwendet).
 - **Viele Schritte** werden eine Call Activity in eigener Datei. Nur dort lassen sich eigene Pools und Blackbox-Pools zeichnen.
 - Zugeklappte eingebettete Teilprozesse sind nur „Visual Sugar“ und haben nur Nachteile.
 
@@ -158,7 +158,7 @@ Was sich nach dem Feedback geändert hat, steht in der README unter [Runde 2](RE
 | Führt eine Abweichung zur Ablehnung? | Nein. Sie führt zu einer menschlichen Entscheidung durch den Kunden oder die Prüfstelle. Ohne Abweichung wird automatisch freigegeben. |
 | Wie verhindert ihr Endlosschleifen? | Höchstens 3 Vorschläge (`anzahlVorschlaege`). Die Ersatz-Schleife begrenzt „Ersatzoption prüfen“ (höchstens 2 Bestellversuche), danach „Keine Bestellung möglich“. Nachfassen nur einmal (`nachgefasst`). |
 | Wie verhindert ihr doppelte Bestellungen? | Nach jedem Start prüft „Laufenden Vorgang prüfen“, ob schon eine Instanz mit Business Key `PH-<Haushalt>:<Produkt>` läuft. |
-| Warum entscheidet das Gateway nach der Bedarfsermittlung und nicht der Teilprozess? | Endereignisse eines eingebetteten Teilprozesses steuern den übergeordneten Fluss nicht. Deshalb hat er nur ein Ende und liefert Daten; das Gateway entscheidet auf `nachversorgungErforderlich`. |
+| Warum entscheidet ein Gateway nach der DMN? | Die DMN liefert nur Daten (`nachversorgungErforderlich`), das Gateway entscheidet (Regel 20). Früher steuerten scheinbar die Enden des Teilprozesses. Deshalb hat er nur ein Ende und liefert Daten; das Gateway entscheidet auf `nachversorgungErforderlich`. |
 | Warum ein Nachrichten-Endereignis statt „Ergebnis mitteilen“ als Aufgabe vor dem Ende? | Es ist dieselbe Semantik mit einem Element weniger: Das Ende sendet die Nachricht. In CIB seven läuft es als External Task. |
 | Warum kann die Prüfstelle nicht ohne Kunde freigeben? | Bewusste Entscheidung (T2-006): Jede Abweichung betrifft den Kunden (Preis, Produkt, Menge), also entscheidet er. |
 | Wie stellt ihr Label-Matching sicher? | Ein Endereignis-Listener setzt `<teilprozess>Ergebnis` = Name des Endereignisses. Das Out-Mapping gibt ihn zurück, und das Gateway prüft genau diesen Text. |
