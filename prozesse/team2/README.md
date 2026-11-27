@@ -154,5 +154,5 @@ Jede teamübergreifende Nachricht soll den gemeinsamen Ereignisrahmen tragen (In
 cd prozesse/team2
 curl -s -X POST http://localhost:8080/engine-rest/deployment/create \
   -F deployment-name=team2-bpmn -F enable-duplicate-filtering=true \
-  $(for f in *.bpmn; do echo -n "-F $f=@$f "; done)
+  $(for f in *.bpmn *.dmn; do echo -n "-F $f=@$f "; done)
 ```
