@@ -97,6 +97,7 @@
 | T2-27 | Abgabe: Code + Datenbankabzug an Stiehl, Fehlerliste, Lizenzhinweise | 2 |
 
 ## Saifudins Paket seit 27.11. in Kurzform
-1. **Schon geliefert (PR #30, #32):** Testdaten (T2-19), Vorlage D Kundenentscheidung (T2-13), Benachrichtigungs-Worker (T2-11), Projektstruktur (T2-02), Prozesslogik-Worker (T2-07, T2-08, T2-10), Endzustand-Test (Teil von T2-06).
-2. **DMN (T2-09):** erste Fassung von Mohammed, liegt in `prozesse/team2`. Pflegen und mit `werkzeuge/dmn-test` testen.
-3. **Noch offen:** lokal `mvn test` für alle Tests, Deploy auf CIB seven (T2-06), Startanleitung (T2-20), BPMN pflegen (T2-22).
+1. **Schon geliefert (PR #30, #32, gemergt am 27.11.):** Testdaten (T2-19), Vorlage D Kundenentscheidung (T2-13), Benachrichtigungs-Worker (T2-11), Projektstruktur (T2-02), Prozesslogik-Worker (T2-07, T2-08, T2-10), Endzustand-Test (Teil von T2-06).
+2. **DMN (T2-09):** erste Fassung von Mohammed, überarbeitet von Saifudin (24.11.), DMN-Test 6/6 grün (27.11.).
+3. **Erledigt 27.11.:** alle Tests lokal grün (DMN 6/6, Endzustand 16/16, Code-Build), Deploy auf CIB seven (T2-06, Instanz PH-0001:TP-M läuft), Startanleitung (T2-20, `werkzeuge/start`, noch von einer zweiten Person zu testen).
+4. **Noch offen:** BPMN pflegen (T2-22), Worker gegen CIB seven laufen lassen, sobald die Datenbank (T2-03) steht.

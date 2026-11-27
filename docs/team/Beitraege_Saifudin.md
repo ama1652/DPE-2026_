@@ -15,6 +15,9 @@ Verantwortlich: Saifudin Mohammadi (GitHub: mohammadisaifuddin187-dev). Stand: 2
 | Testdaten und Schnittstelle | Testfälle TF01–TF16, Schnittstelle Kundenentscheidung (Vorlage D) | 26.11.2026 |
 | Tests | Lokal ausgeführt: DMN-Test 6/6, Endzustand-Test 16/16, Code-Build grün; Fehler in EndzustandTest (Zeile 128) gefunden und behoben | 27.11.2026 |
 | Integration | README-Deploy-Befehl korrigiert (BPMN und DMN), PR #30 und #32 in main gemergt | 27.11.2026 |
+| Deploy CIB seven | CIB seven Run 3.0.0 lokal ohne Docker gestartet, alle 5 BPMN und 2 DMN deployt, Instanz PH-0001:TP-M gestartet (wartet an „Laufenden Vorgang prüfen“, bis die Worker laufen) | 27.11.2026 |
+| Startanleitung (T2-20) | `werkzeuge/start`: README und Doppelklick-Skripte für Tests und Deploy auf CIB seven, ohne Git, Java, Maven oder Docker | 27.11.2026 |
+| Repo-Pflege | Verantwortlich-Angaben in allen Dateien ergänzt und fair korrigiert, Backlog und Aufgabenverteilung aktualisiert, Beitragsnachweis | 27.11.2026 |
 | Koordination | Abstimmung im Team und im Integrationskreis mit Team 1 und Team 3 | laufend |
 
 ## Hinweis

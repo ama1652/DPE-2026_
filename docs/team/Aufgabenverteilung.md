@@ -12,7 +12,7 @@
 ## Bisher erledigt
 | Person | Erledigt |
 |---|---|
-| Saifudin | Unterlagen gesammelt, Repo aufgebaut, komplettes BPMN-Modell (5 Dateien), Doku und Modell-Erklärung, Meilenstein-Vorstellung, Umbau nach Stiehls Feedback (3 Runden), Testdaten (#19), Schnittstelle Kundenentscheidung (#13), Benachrichtigungs-Worker (#11), **Mohammeds Pakete #2, #6, #7, #8, #10 übernommen** (PR #32), **DMN #9 übernommen** (27.11.) |
+| Saifudin | Unterlagen gesammelt, Repo aufgebaut, komplettes BPMN-Modell (5 Dateien), Doku und Modell-Erklärung, Meilenstein-Vorstellung, Umbau nach Stiehls Feedback (3 Runden), Testdaten (#19), Schnittstelle Kundenentscheidung (#13), Benachrichtigungs-Worker (#11), **Mohammeds Pakete #2, #6, #7, #8, #10 übernommen** (PR #32), **DMN #9 übernommen und überarbeitet**, alle Tests lokal grün, PR #30/#32 gemergt, Deploy auf CIB seven, Startanleitung #20 (`werkzeuge/start`), Verantwortlich-Angaben und Beitragsnachweis (27.11.) |
 | Amar | Layout-Skript für die BPMN-Bilder, Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
 | Erion | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell |
 | Mohammed | Abgleich der 11 Punkte aus Stiehls Rückmeldung mit dem überarbeiteten Modell, DMN „Nachversorgungsbedarf“ und „Berechtigungsregel“ mit DMN-Test (#9) |
