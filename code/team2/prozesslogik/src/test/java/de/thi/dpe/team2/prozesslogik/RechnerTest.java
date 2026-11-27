@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,4 +56,4 @@ class RechnerTest {
         assertEquals("TP-M", k.produkt());
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

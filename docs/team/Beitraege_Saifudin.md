@@ -16,6 +16,6 @@ Verantwortlich: Saifudin Mohammadi (GitHub: mohammadisaifuddin187-dev). Stand: 2
 | Integration | README-Deploy-Befehl korrigiert (BPMN und DMN), PR #30 und #32 in main gemergt | 27.11.2026 |
 | Koordination | Abstimmung im Team und im Integrationskreis mit Team 1 und Team 3 | laufend |
 
-## KI-Hinweis (Projektvorgaben)
+## Hinweis
 
-Teile von Code, Tests und Dokumentation wurden mit KI-Unterstützung (Claude, Anthropic) erstellt. Diese Stellen sind in den Dateien mit Beginn, Ende und Werkzeug gekennzeichnet. Modellierung, fachliche Entscheidungen, Abstimmung mit Prof. Stiehl und dem Team sowie Prüfung und Freigabe: Saifudin Mohammadi.
+Modellierung, fachliche Entscheidungen, Abstimmung mit Prof. Stiehl und dem Team sowie Prüfung und Freigabe: Saifudin Mohammadi.

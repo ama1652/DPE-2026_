@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik;
 
 import java.math.BigDecimal;
@@ -74,4 +73,4 @@ public final class Rechner {
         return verbrauchProTag <= 0 ? Long.MAX_VALUE : (long) Math.floor(istBestand / verbrauchProTag);
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

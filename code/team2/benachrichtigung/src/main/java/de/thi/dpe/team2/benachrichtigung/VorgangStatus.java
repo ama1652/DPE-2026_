@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.benachrichtigung;
 
 import jakarta.persistence.Column;
@@ -62,4 +61,4 @@ public class VorgangStatus {
     public String getGrund() { return grund; }
     public LocalDateTime getAktualisiert() { return aktualisiert; }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

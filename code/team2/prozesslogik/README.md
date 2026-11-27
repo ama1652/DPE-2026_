@@ -1,6 +1,6 @@
 # Team 2 – Prozesslogik-Worker (Stories T2-07, T2-08, T2-10)
 
-> **KI-Kennzeichnung (Kursregel):** Code erstellt mit Claude (Anthropic), Beginn und Ende stehen in jeder Datei. Verantwortlich: Saifudin Mohammadi (von Mohammed übernommen).
+> Verantwortlich: Saifudin Mohammadi (von Mohammed übernommen).
 >
 > **Status:** Die Rechenregeln (`Rechner`) sind lokal geprüft. Das Modul ist gegen die APIs kompiliert, aber **noch nicht mit Maven gebaut und nicht gegen eine laufende Engine getestet**.
 

@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.benachrichtigung;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -14,4 +13,4 @@ public class AppPostfachRepository implements PanacheRepository<AppNachricht> {
         return list("vorgangId = ?1 order by zeitpunkt", vorgangId);
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

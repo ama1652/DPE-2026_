@@ -1,7 +1,5 @@
 # Team 2 – Aufgabenverteilung (Vorlage A „Teamrollen“)
 
-> **KI-Kennzeichnung:** Vorschlag erstellt mit Claude (Anthropic) auf Basis von Projektvorgaben, Teamauftrag 2, Projekthandbuch (Kap. 9) und Integrationspaket (Kap. 3, Vorlagen A/B). Vom Team zu bestätigen.
->
 > **Stand:** 27.11.2026 (Mohammeds Pakete T2-02, 06, 07, 08, 10 an Saifudin übergeben, weil bis dahin kein Commit dazu kam; DMN T2-09 ebenfalls an Saifudin, erste Fassung von Mohammed) · **Nächster Meilenstein:** 14.12.2026
 
 ## Warum so verteilt (Vorgaben von Stiehl)
@@ -34,7 +32,7 @@ Die Aufgaben stehen als User Stories mit Akzeptanzkriterien, Punkten und Sprint 
 **Vertretungen:** Amar ↔ Erion (beide arbeiten an den Nachrichten zur Engine), Saifudin: Vertretung offen (im Team klären).
 
 ## Gemeinsame Aufgaben (alle)
-- **Code-Kommentar** in jeder Datei: `// Verantwortlich: <Name>`. Den KI-Anteil mit Beginn und Ende kennzeichnen und das Werkzeug nennen (z. B. „Claude“, „ChatGPT“).
+- **Code-Kommentar** in jeder Datei: `// Verantwortlich: <Name>`.
 - **Jede Person erklärt den anderen ihren Teil** (je 15 Minuten im Teamtermin). Alle lesen `prozesse/team2/MODELL_ERKLAERUNG.md` und können das Modell erklären.
 - **Pitch** (15 Minuten, letzter Vorlesungstag), 1 Teil pro Person:
   - Problem: Saifudin

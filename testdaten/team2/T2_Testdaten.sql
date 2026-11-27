@@ -1,7 +1,6 @@
 -- =====================================================================
 -- Team 2 Materialversorgung - Testdaten (Story T2-19)
 -- Verantwortlich: Saifudin Mohammadi
--- KI-generiert (Claude, Anthropic) - Beginn
 --
 -- Grundlage: Integrationspaket Kap. 8.1 "Künstlicher Testhaushalt"
 --   (PH 0001 Haushalt Bergmann, Lieferant Versorgungsdienst Beispiel,
@@ -193,4 +192,4 @@ INSERT INTO t2_testfall VALUES
   'Lieferant BESTAETIGT; Versandmeldung; keine Lieferbestätigung: Timer P3D; keine Klärung: Timer P7D',
   'Lieferung ungeklärt', 'Übergeben');
 
--- KI-generiert (Claude, Anthropic) - Ende
+

@@ -2,7 +2,7 @@
 import glob, re
 from lxml import etree
 NS={'b':'http://www.omg.org/spec/BPMN/20100524/MODEL'}
-for f in sorted(glob.glob((__import__('sys').argv[1] if len(__import__('sys').argv)>1 else '/home/claude/dpe-2026/prozesse/team2')+'/*.bpmn')):
+for f in sorted(glob.glob((__import__('sys').argv[1] if len(__import__('sys').argv)>1 else 'prozesse/team2')+'/*.bpmn')):
     p=etree.parse(f).find('.//b:process',NS); fn=f.split('/')[-1]
     nodes={e.get('id'):e for e in p if e.get('id') and not etree.QName(e).localname in ('sequenceFlow','laneSet','textAnnotation','association')}
     out={k:[] for k in nodes}; inc={k:[] for k in nodes}

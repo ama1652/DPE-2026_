@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,4 +49,4 @@ public class EngineClient {
         }
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

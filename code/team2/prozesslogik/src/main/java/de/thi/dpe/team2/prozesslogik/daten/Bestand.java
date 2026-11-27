@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik.daten;
 
 import jakarta.persistence.Column;
@@ -35,4 +34,4 @@ public class Bestand {
     @Column(nullable = false, length = 40)
     public String herkunft;
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

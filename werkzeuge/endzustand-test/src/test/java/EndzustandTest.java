@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed, Story T2-06)
-// KI-generiert (Claude, Anthropic) - Beginn
 // Deployt alle BPMN- und DMN-Dateien von Team 2 in eine Camunda-7-Engine im Speicher (gleiche Engine wie CIB seven)
 // und spielt jeden Endzustand des Hauptprozesses einmal durch. Die Worker werden simuliert: Der Test holt jede
 // External Task ab und schließt sie mit den Variablen des Testfalls ab (Testfälle: testdaten/team2).
@@ -178,4 +177,4 @@ public class EndzustandTest {
     endetIn(spielen(new Fall().antworte(LIEF_ANTWORT, v("bestellantwortStatus", "BESTAETIGT")).antworte(VERSAND, v())
         .antworte(BESTAETIGUNG, TIMEOUT).antworte(KLAERUNG, TIMEOUT)), "End_Ungeklaert"); }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

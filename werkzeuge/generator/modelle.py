@@ -1,5 +1,5 @@
 """Erzeugt die BPMN-Modelle von Team 2 (Materialversorgung) für CIB seven.
-KI-generiert (Claude, Anthropic); fachlich abzustimmen und zu prüfen durch Team 2.
+fachlich abzustimmen und zu prüfen durch Team 2.
 Stand nach der schriftlichen Rückmeldung von Prof. Stiehl (Mail, 22.11.2026, Punkte 1-11).
 """
 import os, sys

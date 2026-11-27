@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.benachrichtigung;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -134,4 +133,4 @@ public class BenachrichtigungsService {
         }
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

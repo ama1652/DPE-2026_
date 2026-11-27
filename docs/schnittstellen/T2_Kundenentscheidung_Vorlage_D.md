@@ -1,6 +1,6 @@
 # Schnittstellenvereinbarung: Kundenentscheidung (Vorlage D)
 
-> **KI-Kennzeichnung (Kursregel):** Entwurf erstellt mit Claude (Anthropic) auf Basis von Integrationspaket (Vorlage D, Kap. 6.2–7.5), Teamauftrag 2 (Kap. 2.2) und unserem Modell `prozesse/team2/T2_Kundenentscheidung.bpmn`. Verantwortlich im Team: Saifudin Mohammadi (Story T2-13).
+> Verantwortlich im Team: Saifudin Mohammadi (Story T2-13).
 >
 > **Status:** **Entwurf – Vorschlag zur Abstimmung im Integrationskreis.** Nicht einseitig festgelegt. Team 1 und Team 3 müssen zustimmen, bevor sie die Schnittstelle nutzen.
 

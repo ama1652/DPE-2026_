@@ -2,7 +2,6 @@
 <!--
   Team 2 Materialversorgung - Worker der Prozesslogik (Stories T2-07, T2-08, T2-10)
   Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-  KI-generiert (Claude, Anthropic) - Beginn
   Eigenständiges Quarkus-Modul. Wird in die Projektstruktur aus T2-02 (Mohammed) übernommen.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -80,5 +79,4 @@
       </plugin>
     </plugins>
   </build>
-  <!-- KI-generiert (Claude, Anthropic) - Ende -->
 </project>

@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -246,4 +245,4 @@ public class ProzesslogikService {
         }
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

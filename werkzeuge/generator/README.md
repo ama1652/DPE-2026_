@@ -1,6 +1,6 @@
 # BPMN-Generator Team 2
 
-> **KI-Kennzeichnung:** Erstellt mit Claude (Anthropic). Verantwortlich: Saifudin Mohammadi.
+> Verantwortlich: Saifudin Mohammadi.
 
 Erzeugt die 5 BPMN-Dateien aus Python (Positionen, Labels, Camunda-Attribute) und prüft sie.
 

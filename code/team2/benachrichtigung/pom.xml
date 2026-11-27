@@ -2,7 +2,6 @@
 <!--
   Team 2 Materialversorgung - Benachrichtigungs-Worker (Story T2-11)
   Verantwortlich: Saifudin Mohammadi
-  KI-generiert (Claude, Anthropic) - Beginn
   Eigenständiges Quarkus-Modul. Wird in die Projektstruktur aus T2-02 (Mohammed) übernommen.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -76,5 +75,4 @@
       </plugin>
     </plugins>
   </build>
-  <!-- KI-generiert (Claude, Anthropic) - Ende -->
 </project>

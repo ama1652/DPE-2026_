@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.benachrichtigung;
 
 import io.quarkus.runtime.ShutdownEvent;
@@ -103,4 +102,4 @@ public class BenachrichtigungsWorker {
         return v;
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

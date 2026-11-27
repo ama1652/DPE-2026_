@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik.daten;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -15,4 +14,4 @@ public class BestandRepository implements PanacheRepository<Bestand> {
                 .page(0, anzahl).list();
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

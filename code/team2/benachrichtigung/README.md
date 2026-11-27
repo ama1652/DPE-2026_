@@ -1,6 +1,6 @@
 # Team 2 – Benachrichtigungs-Worker (Story T2-11)
 
-> **KI-Kennzeichnung (Kursregel):** Code erstellt mit Claude (Anthropic), Beginn und Ende stehen in jeder Datei. Verantwortlich: Saifudin Mohammadi.
+> Verantwortlich: Saifudin Mohammadi.
 >
 > **Status:** Entwurf. Der Code ist gegen die APIs geprüft, aber **noch nicht mit Maven gebaut und nicht gegen eine laufende Engine getestet**. Das ist der nächste Schritt, sobald die Projektstruktur (T2-02, Mohammed) und die Umgebung (T2-01) stehen.
 

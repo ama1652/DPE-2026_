@@ -2,7 +2,6 @@
 <!--
   Team 2 Materialversorgung - gemeinsames Maven-Projekt (Story T2-02)
   Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-  KI-generiert (Claude, Anthropic) - Beginn
   Module:
     benachrichtigung  - Benachrichtigungs-Worker (T2-11)
     prozesslogik      - Worker der Prozesslogik (T2-07, T2-08, T2-10)
@@ -21,5 +20,4 @@
     <module>benachrichtigung</module>
     <module>prozesslogik</module>
   </modules>
-  <!-- KI-generiert (Claude, Anthropic) - Ende -->
 </project>

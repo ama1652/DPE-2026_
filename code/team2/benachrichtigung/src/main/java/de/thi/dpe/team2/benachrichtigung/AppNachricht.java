@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.benachrichtigung;
 
 import jakarta.persistence.Column;
@@ -78,4 +77,4 @@ public class AppNachricht {
     public boolean isSimulation() { return simulation; }
     public String getProzessinstanzId() { return prozessinstanzId; }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

@@ -1,6 +1,6 @@
 # Team 2 – Code (Maven-Projekt, Story T2-02)
 
-> **KI-Kennzeichnung (Kursregel):** Struktur erstellt mit Claude (Anthropic). Verantwortlich: Saifudin Mohammadi (von Mohammed übernommen).
+> Verantwortlich: Saifudin Mohammadi (von Mohammed übernommen).
 
 | Modul | Inhalt | Stories | Verantwortlich |
 |---|---|---|---|

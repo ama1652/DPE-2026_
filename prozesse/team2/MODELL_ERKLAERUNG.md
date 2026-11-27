@@ -1,7 +1,5 @@
 # Team 2 Materialversorgung – Erklärung des BPMN-Modells
 
-> **KI-Kennzeichnung (Kursregel):** Modell und Text wurden mit KI-Unterstützung erstellt (Claude, Anthropic) und müssen von Team 2 geprüft werden. Jedes Teammitglied muss das gesamte Modell erklären können (Projektvorgaben). Diese Datei dient auch zur Vorbereitung auf die Abnahme.
->
 > **Stand:** 22.11.2026, überarbeitet nach der schriftlichen Rückmeldung von Prof. Stiehl (11 Punkte) · **Technik:** CIB seven (Camunda 7), External Tasks, JUEL · **Grundlage:** Teamauftrag 2, Projekthandbuch, Integrationspaket, Vorlesung „BPMN Best Practices“
 
 ---

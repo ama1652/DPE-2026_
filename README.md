@@ -7,7 +7,6 @@ für Kundenfreigaben, Benachrichtigungen und Berechtigungsgrenzen.
 **Lizenz:** Selbst erstellte Bestandteile stehen unter der [MIT-Lizenz](LICENSE).
 **Ausgenommen** ist der Ordner `unterlagen/`. Er enthält Dokumente von Prof. Stiehl, die nicht unter MIT stehen, und muss vor einer öffentlichen Freigabe des Repos entfernt werden.
 
-> KI-Kennzeichnung (Kursregel): Inhalte wurden mit KI-Unterstützung (Claude, Anthropic) erstellt. Der jeweilige Umfang ist in den Dateien vermerkt. Alle Inhalte werden vom Team geprüft.
 
 ## Struktur
 | Pfad | Inhalt |

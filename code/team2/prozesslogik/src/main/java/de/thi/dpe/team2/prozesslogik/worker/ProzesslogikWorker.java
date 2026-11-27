@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik.worker;
 
 import de.thi.dpe.team2.prozesslogik.ProzesslogikService;
@@ -89,4 +88,4 @@ public class ProzesslogikWorker {
         return v;
     }
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

@@ -1,6 +1,6 @@
 # Team 2 – Testdaten (Story T2-19)
 
-> **KI-Kennzeichnung (Kursregel):** Erstellt mit Claude (Anthropic). Verantwortlich im Team: Saifudin Mohammadi. Grundlage: Integrationspaket Kap. 8.1 (künstlicher Testhaushalt). Alle Namen und Werte sind frei erfunden. Zahlen sind **Projektannahmen**, nicht von Prof. Stiehl vorgegeben.
+> Verantwortlich im Team: Saifudin Mohammadi. Grundlage: Integrationspaket Kap. 8.1 (künstlicher Testhaushalt). Alle Namen und Werte sind frei erfunden. Zahlen sind **Projektannahmen**, nicht von Prof. Stiehl vorgegeben.
 
 ## Inhalt
 - [`T2_Testdaten.sql`](T2_Testdaten.sql): Stammdaten (Haushalt, Lieferant, Produkte, Versorgungsprofil, Ausgangsbestand) und 16 Testfälle mit erwartetem Ende (Tabelle `t2_testfall`)

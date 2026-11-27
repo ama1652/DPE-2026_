@@ -1,5 +1,4 @@
 // Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed)
-// KI-generiert (Claude, Anthropic) - Beginn
 package de.thi.dpe.team2.prozesslogik.daten;
 
 import jakarta.persistence.Column;
@@ -46,4 +45,4 @@ public class Versorgungsprofil {
     @Column(name = "pruefintervall_tage", nullable = false)
     public int pruefintervallTage;
 }
-// KI-generiert (Claude, Anthropic) - Ende
+

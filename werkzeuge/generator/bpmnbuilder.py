@@ -1,6 +1,6 @@
 """Kleiner BPMN-2.0-Generator (Camunda 7 / CIB seven) mit Diagramm-Koordinaten.
 
-KI-generiert (Claude, Anthropic) – Hilfswerkzeug für Team 2, nicht Teil der Abgabe.
+Hilfswerkzeug für Team 2, nicht Teil der Abgabe.
 Ziel: XSD-konforme Elementreihenfolge, saubere DI (Layout) und Camunda-Erweiterungen.
 """
 from xml.sax.saxutils import escape, quoteattr

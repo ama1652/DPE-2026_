@@ -1,7 +1,5 @@
 # Team 2 Materialversorgung – Product Backlog
 
-> **KI-Kennzeichnung:** Erstellt mit Claude (Anthropic) aus Teamauftrag 2, Projektvorgaben, Projekthandbuch, Integrationspaket und unserem BPMN-Modell (`prozesse/team2`). Vom Team zu bestätigen.
->
 > **Aufgabenbrett:** jede Story ist ein [GitHub Issue](https://github.com/mohammadisaifuddin187-dev/DPE-2026_/issues) mit gleicher Nummer (T2-05 = #5), Labels `epic: …` / `wer: …`, Meilenstein = Sprint.
 >
 > **Stand:** 27.11.2026 (Mohammeds Stories T2-02, 06–10 an Saifudin übergeben) · Format wie in TerraMax: *Als … möchte ich …, damit …* + Akzeptanzkriterien. Punkte nach Fibonacci (1, 2, 3, 5, 8).
@@ -24,7 +22,7 @@
 | **Saifudin** | Benachrichtigung, Testdaten, Doku, Schnittstelle Kundenentscheidung, BPMN; **seit 27.11. auch** External-Task-Worker, DMN, Deploy auf CIB seven | 34 |
 
 ## Definition of Done (für jede Story)
-- Der Code liegt im Repo und hat den Kommentar `// Verantwortlich: <Name>`. Der KI-Anteil ist mit Beginn, Ende und Werkzeug gekennzeichnet (Projektvorgaben).
+- Der Code liegt im Repo und hat den Kommentar `// Verantwortlich: <Name>`.
 - Die Story läuft lokal mit den Testdaten. Die Schritte stehen in der Startanleitung.
 - Eine zweite Person hat den Pull Request angesehen und kann den Code erklären.
 - Keine Passwörter oder echten Daten im Repo.
