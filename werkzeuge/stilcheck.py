@@ -1,3 +1,4 @@
+# Verantwortlich: Saifudin Mohammadi
 # Prüft Label-Matching (Stiehl Regeln 10-12, 14, 16, 17), Camunda-7-Pflichtattribute und die Verweise der Regelaufgaben auf die DMN-Dateien.
 import glob, sys
 from lxml import etree

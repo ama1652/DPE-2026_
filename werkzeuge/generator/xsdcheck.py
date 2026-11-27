@@ -1,3 +1,4 @@
+# Verantwortlich: Saifudin Mohammadi
 # XSD-Prüfung gegen das offizielle BPMN-2.0-Schema (OMG), wie es auch die Engine beim Deploy prüft.
 import sys, glob
 from lxml import etree

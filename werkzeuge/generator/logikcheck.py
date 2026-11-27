@@ -1,3 +1,4 @@
+# Verantwortlich: Saifudin Mohammadi
 # Strukturprüfung: Erreichbarkeit, Sackgassen, Gateway-Vollständigkeit (je Prozess)
 import glob, re
 from lxml import etree

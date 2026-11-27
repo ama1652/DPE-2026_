@@ -1,3 +1,4 @@
+<!-- Verantwortlich: Saifudin Mohammadi -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion>
 <groupId>de.thi.dpe.team2</groupId><artifactId>endzustand-test</artifactId><version>1</version>
 <properties><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>

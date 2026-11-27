@@ -1,4 +1,5 @@
 """Kleiner BPMN-2.0-Generator (Camunda 7 / CIB seven) mit Diagramm-Koordinaten.
+Verantwortlich: Saifudin Mohammadi (im Team mit Amar, Erion und Mohammed abgestimmt).
 
 Hilfswerkzeug für Team 2, nicht Teil der Abgabe.
 Ziel: XSD-konforme Elementreihenfolge, saubere DI (Layout) und Camunda-Erweiterungen.

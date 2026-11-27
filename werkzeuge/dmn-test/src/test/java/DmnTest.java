@@ -1,3 +1,4 @@
+// Verantwortlich: Saifudin Mohammadi (übernommen von Mohammed, erste Fassung Mohammed)
 // Team 2: deployt alle BPMN- und DMN-Dateien in eine Camunda-7-Engine im Speicher und prüft beide Entscheidungstabellen und die Regelaufgaben im Prozess. Start: cd werkzeuge/dmn-test && mvn test
 import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;

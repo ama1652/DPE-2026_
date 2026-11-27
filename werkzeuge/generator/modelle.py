@@ -1,4 +1,5 @@
 """Erzeugt die BPMN-Modelle von Team 2 (Materialversorgung) für CIB seven.
+Verantwortlich: Saifudin Mohammadi (im Team mit Amar, Erion und Mohammed abgestimmt).
 fachlich abzustimmen und zu prüfen durch Team 2.
 Stand nach der schriftlichen Rückmeldung von Prof. Stiehl (Mail, 22.11.2026, Punkte 1-11).
 """
@@ -81,7 +82,7 @@ def hauptprozess():
               'zielbestand; dazu verbrauchssprung bei deutlich verändertem Verbrauch.')
     p.add('SB_Bedarf', 'businessRuleTask', 'Nachversorgungsbedarf feststellen', 950, Y, size=(150, 80),
           decision='Nachversorgungsbedarf', result='bedarfErgebnis',
-          doc='DMN "Nachversorgungsbedarf" (T2_Nachversorgungsbedarf.dmn, Verantwortlich: Mohammed): Reicht der Bestand '
+          doc='DMN "Nachversorgungsbedarf" (T2_Nachversorgungsbedarf.dmn, Verantwortlich: Saifudin Mohammadi, erste Fassung Mohammed): Reicht der Bestand '
               'bis zum nächsten Prüftermin plus Lieferzeit? Die Engine wertet die Tabelle selbst aus (decisionRef). '
               'Ausgaben: nachversorgungErforderlich, nachversorgungsbedarf, bedarfsbegruendung.',
           listeners=[("${execution.setVariable('nachversorgungErforderlich', bedarfErgebnis.nachversorgungErforderlich)}", 'end'),
@@ -226,7 +227,7 @@ def bestellfreigabe():
           listeners=[("${execution.setVariable('anzahlVorschlaege', anzahlVorschlaege + 1)}", 'end')])
     p.add('T_Regel', 'businessRuleTask', 'Berechtigungsregel anwenden', 580, Y,
           decision='Berechtigungsregel', result='berechtigungErgebnis',
-          doc='DMN "Berechtigungsregel" (T2_Berechtigungsregel.dmn, Verantwortlich: Mohammed): ermittelt die Abweichungen '
+          doc='DMN "Berechtigungsregel" (T2_Berechtigungsregel.dmn, Verantwortlich: Saifudin Mohammadi, erste Fassung Mohammed): ermittelt die Abweichungen '
               '(Preis, Produktwechsel, Verbrauchssprung, Lieferant, Menge) und daraus freigabeweg = AUTOMATISCH, '
               'KUNDENFREIGABE oder PRUEFUNG. Ersetzt "Abweichungen prüfen" (Stiehl Punkt 11). Die Engine wertet die '
               'Tabelle selbst aus (decisionRef). Hit Policy FIRST, mit Prof. Stiehl am 25.11. besprochen.',
