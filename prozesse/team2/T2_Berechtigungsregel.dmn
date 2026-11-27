@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Verantwortlich: Saifudin Mohammadi (DMN übernommen, erste Fassung Mohammed) -->
+<!-- Verantwortlich: Saifudin Mohammadi (erste Fassung Mohammed, überarbeitete Fassung und Pflege: Saifudin Mohammadi) -->
 <definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_T2_Berechtigungsregel" name="Berechtigungsregel" namespace="http://thi.de/dpe/team2" exporter="Team 2 Materialversorgung" exporterVersion="1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.22.0">
   <decision id="Berechtigungsregel" name="Berechtigungsregel anwenden" camunda:historyTimeToLive="P180D">
     <informationRequirement id="IR_Vorschlag">

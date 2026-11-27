@@ -1,6 +1,6 @@
 # Team 2 Materialversorgung – Erklärung des BPMN-Modells
 
-> Verantwortlich: Saifudin Mohammadi (Modell erstellt; Review gegen Stiehls 11 Punkte und einzelne Verbesserungen: Amar, Erion, Mohammed).
+> Verantwortlich: Saifudin Mohammadi (Modell erstellt und alle Überarbeitungen umgesetzt; Prüfung gegen Stiehls 11 Punkte: Amar, Erion, Mohammed).
 
 > **Stand:** 22.11.2026, überarbeitet nach der schriftlichen Rückmeldung von Prof. Stiehl (11 Punkte) · **Technik:** CIB seven (Camunda 7), External Tasks, JUEL · **Grundlage:** Teamauftrag 2, Projekthandbuch, Integrationspaket, Vorlesung „BPMN Best Practices“
 
