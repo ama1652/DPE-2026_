@@ -125,7 +125,7 @@ public class EndzustandTest {
 
   @Test void tf04_preisZuHoch_kundeGibtFrei() {
     endetIn(spielen(lieferungOk(new Fall().setze("t2-vorschlag-erstellen", "preisGesamt", 82.5)
-        .antworte(KUNDE, v("entscheidung", "FREIGEBEN"))))), "End_Abgeschlossen"); }
+        .antworte(KUNDE, v("entscheidung", "FREIGEBEN")))), "End_Abgeschlossen"); }
 
   @Test void tf05_kundeLehntAb() {
     endetIn(spielen(new Fall().setze("t2-vorschlag-erstellen", "preisGesamt", 82.5)
