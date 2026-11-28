@@ -59,8 +59,27 @@ Die PDFs zeigen die Mac-Befehle. Unter Windows schreibt man statt `python3 pfad.
 | `python3 pfad.py aufraeumen` | `pfad aufraeumen` | löscht **alle** laufenden Team-2-Instanzen (fragt vorher) |
 | `… --wahl 1,1,2,…` | `… --wahl 1,1,2,…` | spielt einen Pfad automatisch ab (Tabelle unten) |
 | `… --alles-simulieren` | `… --alles-simulieren` | ignoriert die Liste `ECHT` und simuliert wieder alles (siehe 3.) |
+| `… --details` | `… --details` | zeigt alle Elemente, alle Variablen und IDs statt der Kurzfassung |
 
-Im Terminal sieht man an jedem Haltepunkt, was **in echt** an dieser Stelle passiert und welcher Worker oder welches Team dafür zuständig ist. Darunter stehen die Wahlmöglichkeiten und wohin sie führen. Nach der Tasklist-Aufgabe zeigt das Skript das eingegebene Prüfergebnis und die Begründung an.
+**So liest man die Ausgabe:**
+
+```
+   Was passiert ist:
+     ✓ Verbrauch und Reichweite berechnen   [echter Worker]  Verbrauchssprung: nein, Reichweite Tage: 7, Bestand: 30
+     ✓ Nachversorgungsbedarf feststellen    [DMN]            nachbestellen: ja
+     » hinein in Teilprozess Bestellfreigabe
+     ✓ Produkt und Menge vorschlagen        [echter Worker]  Vorschlag: Testprodukt M, 3 Pck., 74,70 €
+   Stand: Bestand 30 · Reichweite 7 Tage · Vorschlag Testprodukt M, 3 Pck., 74,70 € · Freigabe AUTOMATISCH · Bestellversuch 1
+
+━━ Schritt 1: Bestellung übermitteln (Bestellabwicklung, Teilprozess)
+   In echt: …
+   1) Erledigt melden …
+```
+
+- **Was passiert ist:** alles seit deiner letzten Eingabe, eine Zeile pro Aufgabe mit dem Ergebnis. In Klammern steht, wer die Aufgabe erledigt hat: `[echter Worker]`, `[pfad.py]` (noch simuliert), `[DMN]`, `[Tasklist]` oder `[Nachricht]`. Hat sich ein Wert geändert, steht der alte Wert in Klammern dahinter („vorher …“). `»` und `«` zeigen, wann die Instanz in einen Teilprozess hinein- und wieder hinausgeht, `⏰` eine abgelaufene Frist.
+- **↳ (Begründung):** Bei Rechnungen und Regeln steht darunter, wie das Ergebnis zustande kam, z. B. `↳ Abweichung: Preis 79,20 € > Grenze 75,00 € · Ersatzprodukt → KUNDENFREIGABE`. `pfad.py` rechnet das aus den gesetzten Variablen nach (Funktion `warum`).
+- **Stand:** die wichtigsten Werte der Instanz. Die Zeile erscheint nur, wenn sich etwas geändert hat.
+- **Schritt N:** Hier entscheidest du. „In echt“ sagt, wer das später übernimmt. Schritte, die ein echter Worker erledigt, bekommen keine eigene Überschrift.
 
 ## 3. Wie es weitergeht, wenn echte Teile fertig werden
 
@@ -139,6 +158,7 @@ Wer mit einem Assistenten am Repo arbeitet: Dieser Abschnitt ist für ihn geschr
 - `pfad.py` ist ein **Test-Hilfsmittel, kein Produktivcode**. Es ersetzt per REST (`fetchAndLock`/`complete`, `POST /message`, `POST /condition`, Timer-Jobs ausführen) die Teile, die noch fehlen.
 - **Nur Python-Standardbibliothek.** Unter Windows läuft es mit dem portablen Embedded-Python, dort gibt es kein `pip`. Keine Zusatzpakete einbauen.
 - Wird ein Worker oder Sender fertig: Topic bzw. Nachrichtenname in `ECHT` eintragen (eine Zeile, Kommentar mit Name und Issue), und zwar **im selben PR** wie der Worker. Nicht die Simulation in `TOPICS`/`NACHRICHTEN` löschen. Die braucht `--alles-simulieren` weiterhin.
+- Die Begründungen (`warum` in `pfad.py`) bilden die Regeln aus `prozesse/team2/DMN.md` und `code/team2/prozesslogik/README.md` nach. Ändert sich dort eine Regel (Grenzen, Reihenfolge, Formel), `warum` im selben PR anpassen.
 - Werden im Modell (`prozesse/team2`) Topics, Nachrichten, Variablen oder Wege geändert: `TOPICS`/`NACHRICHTEN` in `pfad.py` und die Tabelle in Abschnitt 4 anpassen. Danach alle 19 Pfade automatisch laufen lassen (Tabelle in Abschnitt 4, mit `--alles-simulieren`, falls `ECHT` nicht leer ist). Jeder Lauf muss mit dem erwarteten `End_…` enden.
 - **Nie** echte Worker und `pfad.py --alles-simulieren` gleichzeitig auf denselben Topics laufen lassen.
 - `aufraeumen` löscht **alle** laufenden Team-2-Instanzen. Nicht ungefragt ausführen. Einzelne Testinstanzen gezielt per `DELETE /process-instance/<id>` löschen.
