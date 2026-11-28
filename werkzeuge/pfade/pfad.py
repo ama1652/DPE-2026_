@@ -9,6 +9,7 @@
 #   python3 pfad.py weiter [instanz-id]  die zuletzt gestartete (oder eine beliebige, z. B. echt gestartete) Instanz weiterspielen
 #   python3 pfad.py status               zeigen, wo die Instanz gerade steht
 #   python3 pfad.py aufraeumen           alle laufenden Team-2-Instanzen löschen (fragt vorher)
+#   ... --details                        alle Elemente, alle Variablen und IDs zeigen (statt der Kurzfassung)
 #   ... --alles-simulieren               die Liste ECHT ignorieren und alles simulieren (echte Worker vorher beenden!)
 #
 # Windows: statt "python3 pfad.py" einfach "pfad" (pfad.cmd im selben Ordner). Anleitung: README.md
@@ -32,6 +33,7 @@ AUTH = "Basic " + base64.b64encode(b"demo:demo").decode()
 VORAUSWAHL = []  # nur für automatische Läufe: --wahl 1,2,1
 CMD = "pfad" if os.name == "nt" else "python3 pfad.py"
 
+sys.stdout.reconfigure(errors="replace")  # Konsole ohne UTF-8: ? statt Absturz bei ✓ ⏳
 if os.name == "nt": os.system("")  # schaltet im Windows-Konsolenfenster die Farbcodes ein
 FETT, GRUEN, GELB, BLAU, ROT, AUS = ("\033[1m", "\033[32m", "\033[33m", "\033[36m", "\033[31m", "\033[0m") \
     if sys.stdout.isatty() and not os.environ.get("NO_COLOR") else ("",) * 6
@@ -140,26 +142,144 @@ def zeit(aid):  # Activity-Instance-IDs sind zeitbasierte UUIDs -> exakte Reihen
 
 AUFGERUFEN = {"CA_Bestellfreigabe": "T2_Bestellfreigabe", "CA_Bestellabwicklung": "T2_Bestellabwicklung",
               "CA_Lieferpruefung": "T2_Lieferpruefung", "CA_KE": "T2_Kundenentscheidung"}
-gesehen = set()
+gesehen = set()      # bereits ausgegebene Activity-Instanzen
+gesehen_var = set()  # bereits ausgewertete Variablen-Änderungen
+STAND = {}           # letzter bekannter Wert je Variable (für "alt -> neu" und die Statuszeile)
+DETAILS = False      # --details: alle Elemente, alle Variablen, IDs
+LABEL = {"vorgangOffen": "Vorgang schon offen", "istBestand": "Bestand", "reichweiteTage": "Reichweite Tage",
+         "verbrauchssprung": "Verbrauchssprung", "nachversorgungErforderlich": "nachbestellen", "bestellvorschlag": "Vorschlag",
+         "freigabeweg": "Freigabeweg", "freigabeBegruendung": "weil", "ersatzMoeglich": "Ersatz möglich", "entscheidung": "Kunde",
+         "pruefergebnis": "Prüfstelle", "pruefbegruendung": "Begründung", "bestellantwortStatus": "Lieferant",
+         "lieferbefund": "Lieferung", "klaerungsergebnis": "Klärung", "vorgangszustand": "Vorgang"}
+HINWEIS = {"t2-freigabeanfrage-senden": "Freigabeanfrage ins App-Postfach", "t2-lieferbestaetigung-anfordern": "Bitte um Bestätigung ins App-Postfach",
+           "t2-ergebnis-mitteilen": "Ergebnis ins App-Postfach", "t2-bestellung-senden": "Bestellung an den Lieferanten",
+           "t2-nachfassen-beauftragen": "Nachfassen bei Team 3", "t2-klaerung-beauftragen": "Klärung bei Team 3",
+           "t2-klaerungsfall-uebergeben": "Fall ungeklärt übergeben", "t2-nachweis-uebergeben": "Liefernachweis an Team 1"}
+
+def kurz(v):
+    t = json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else str(v)
+    return t if len(t) <= 70 else t[:67] + "..."
+
+def wert(n, v):
+    if isinstance(v, bool): return "ja" if v else "nein"
+    if n == "preisGesamt": return f"{v:.2f} €".replace(".", ",")
+    if n == "bestellvorschlag":
+        try: b = json.loads(v); return f"{b['produktName']}, {b['packungen']} Pck., " + f"{b['preisGesamt']:.2f} €".replace(".", ",")
+        except (ValueError, KeyError, TypeError): pass
+    return kurz(v)
+
+def zahl(v):
+    return f"{v:g}".replace(".", ",") if isinstance(v, float) else str(v)
+
+def euro(v): return f"{v:.2f} €".replace(".", ",")
+
+def warum(aid, st):
+    """Eine Zeile Begründung zu Rechnungen und Regeln, aus den Variablen zum Zeitpunkt der Aufgabe."""
+    g = st.get
+    try:
+        if aid == "T_Offen":
+            return "für diesen Haushalt und dieses Produkt läuft schon eine Instanz" if g("vorgangOffen") \
+                else "keine andere laufende Instanz für diesen Haushalt und dieses Produkt"
+        if aid == "SB_Reichweite":
+            t = f"Reichweite = Bestand {g('istBestand')} ÷ {zahl(g('verbrauchProTag'))} Stück/Tag = {g('reichweiteTage')} Tage"
+            return t + ("; Sprung: zuletzt beobachteter Verbrauch ≥ 1,5 × Annahme" if g("verbrauchssprung") else "")
+        if aid == "SB_Bedarf":
+            tage = g("tageBisPruefung") + g("lieferzeitTage")
+            rest = g("istBestand") - g("verbrauchProTag") * tage
+            t = (f"nach {g('tageBisPruefung')} + {g('lieferzeitTage')} Tagen blieben {g('istBestand')} − {zahl(g('verbrauchProTag'))} × {tage} = "
+                 f"{zahl(rest)} Stück, Mindestbestand {g('mindestbestand')}")
+            return t + (f" → zu wenig, Bedarf {g('zielbestand')} − {g('istBestand')} = {g('nachversorgungsbedarf')}" if rest < g("mindestbestand") else " → reicht")
+        if aid == "T_Vorschlag":
+            b = json.loads(g("bestellvorschlag"))
+            t = (f"Zielbestand {g('zielbestand')} − Bestand {g('istBestand')} = {g('zielbestand') - g('istBestand')} Stück → "
+                 f"{b['packungen']} Pck. ({b['stueck']} Stück), Preis {euro(b['preisGesamt'])}")
+            return t + (f"; Ersatzprodukt, weil: {g('ersatzGrund') or 'bevorzugtes Produkt nicht lieferbar'}" if g("produktGewechselt") else "")
+        if aid == "T_Regel":
+            p, gr, m, z = g("preisGesamt"), g("preisgrenze"), g("bestellmenge"), g("zielbestand")
+            abw = [n for n, ja in (("Produkt nicht hinterlegt", not g("produktHinterlegt")), ("Verbrauchssprung", g("verbrauchssprung")),
+                                   (f"Preis {euro(p)} > Grenze {euro(gr)}", p > gr), ("Ersatzprodukt", g("produktGewechselt")),
+                                   ("anderer Lieferant", g("lieferantGewechselt")), (f"Menge {m} > Zielbestand {z}", m > z)) if ja]
+            if not abw: return f"keine Abweichung (Preis {euro(p)} ≤ {euro(gr)}, Menge {m} ≤ {z}, Produkt hinterlegt, kein Sprung, kein Wechsel) → AUTOMATISCH"
+            return "Abweichung: " + " · ".join(abw) + f" → {g('freigabeweg')}" + (" (die strengste Regel gewinnt)" if len(abw) > 1 else "")
+        if aid == "T_Ersatz":
+            n = g("anzahlBestellversuche")
+            return f"Ersatz im Profil hinterlegt, Bestellversuch {n} von höchstens 2" if g("ersatzMoeglich") \
+                else (f"schon {n} Bestellversuche (höchstens 2)" if n and n >= 2 else "keine verfügbare Ersatzoption hinterlegt")
+    except (TypeError, ValueError, KeyError):
+        return None  # Variablen fehlen (z. B. simulierter Schritt mit anderen Werten): dann keine Begründung
+    return None
+
+def ohne_t2(proz): return proz.replace("T2_", "")
+
+LETZTER_STAND = None
+BLOCK_OFFEN = False  # "Was passiert ist:" schon ausgegeben und seitdem keine neue Überschrift
+def statuszeile():
+    t = []
+    if STAND.get("istBestand") is not None: t.append(f"Bestand {STAND['istBestand']}")
+    if STAND.get("reichweiteTage") is not None: t.append(f"Reichweite {STAND['reichweiteTage']} Tage")
+    if STAND.get("bestellvorschlag"): t.append("Vorschlag " + wert("bestellvorschlag", STAND["bestellvorschlag"]))
+    if STAND.get("freigabeweg"): t.append(f"Freigabe {STAND['freigabeweg']}")
+    if STAND.get("anzahlBestellversuche"): t.append(f"Bestellversuch {STAND['anzahlBestellversuche']}")
+    if STAND.get("vorgangszustand"): t.append(STAND["vorgangszustand"])
+    global LETZTER_STAND
+    if t and t != LETZTER_STAND: print(f"   {FETT}Stand:{AUS} " + " · ".join(t))  # nur wenn sich etwas geändert hat
+    LETZTER_STAND = t
+
 def neu_gelaufen(pi, zeigen=True):
-    """Gibt aus, welche Elemente die Engine seit dem letzten Haltepunkt automatisch durchlaufen hat."""
-    zeilen = []
+    """Zeigt, was seit der letzten Eingabe passiert ist: welche Aufgabe, wer sie erledigt hat, was dabei herauskam."""
+    zeilen, aenderungen, log, alle_ai = [], [], {}, set()
     for i in baum(pi):
         for a in call("GET", f"/history/activity-instance?processInstanceId={i}&sortBy=startTime&sortOrder=asc"):
+            alle_ai.add(a["id"])
             if a["id"] in gesehen or a["endTime"] is None: continue
             gesehen.add(a["id"])
             if not a["activityName"] and a["activityType"] == "exclusiveGateway": continue  # Zusammenführung ohne Namen
-            zeilen.append((zeit(a["id"]), prozessname(a["processDefinitionId"]), a["activityType"], a["activityName"] or a["activityId"], a["activityId"]))
+            if a.get("canceled") and not DETAILS: continue  # z. B. Empfang, den die abgelaufene Frist beendet hat
+            zeilen.append((zeit(a["id"]), prozessname(a["processDefinitionId"]), a["activityType"], a["activityName"] or a["activityId"], a["activityId"], a["id"]))
+        aenderungen += [d for d in call("GET", f"/history/detail?processInstanceId={i}&variableUpdates=true") if d["id"] not in gesehen_var]
+        log.update({l["activityInstanceId"]: (l["workerId"], l["topicName"]) for l in call("GET", f"/history/external-task-log?processInstanceId={i}&successLog=true")})
     zeilen.sort()
     # Eine Call Activity ist erst fertig, wenn ihr Teilprozess fertig ist: hinter dessen letztes Element schieben
     for ca in [z for z in zeilen if z[2] == "callActivity"]:
         kind = AUFGERUFEN.get(ca[4]); zeilen.remove(ca)
         pos = max([i for i, z in enumerate(zeilen) if z[1] == kind], default=-1)
         zeilen.insert(pos + 1, ca)
-    if zeigen and zeilen:
-        print(f"{GELB}   Automatisch durchlaufen:{AUS}")
-        for _, proz, typ_, name, _ in zeilen:
-            print(f"{GELB}     · {proz:24} {typ_:22} {name}{AUS}")
+    gesetzt, schnapp = {}, {}  # Activity-Instanz -> [(name, alt, neu)] bzw. Variablen nach dieser Aufgabe
+    for d in sorted(aenderungen, key=lambda d: d["time"]):
+        if d.get("activityInstanceId") not in gesehen and d.get("activityInstanceId") in alle_ai: continue  # Aufgabe läuft noch: später zeigen
+        gesehen_var.add(d["id"])
+        n, v, vorher = d["variableName"], d["value"], STAND.get(d["variableName"])
+        STAND[n] = v
+        schnapp[d.get("activityInstanceId")] = dict(STAND)
+        if v is not None: gesetzt.setdefault(d.get("activityInstanceId"), []).append((n, vorher, v))
+    if not (zeigen and zeilen): return
+    ausgabe = []
+    for _, proz, typ_, name, aid, ai in zeilen:
+        w, topic = log.get(ai, (None, None))
+        if DETAILS:
+            ausgabe.append(f"{GELB}     · {proz:24} {typ_:22} {name}{AUS}  [{aid}{', ' + w if w else ''}]")
+            for n, alt, v in gesetzt.get(ai, []):
+                if typ_ != "callActivity": ausgabe.append(f"         {n}: {kurz(alt)} -> {kurz(v)}" if alt not in (None, v) else f"         {n} = {kurz(v)}")
+            continue
+        if typ_ == "startEvent" and proz != "T2_Materialversorgung":
+            ausgabe.append(f"     {BLAU}» hinein in Teilprozess {ohne_t2(proz)}{AUS}")
+        elif typ_ == "noneEndEvent" and proz != "T2_Materialversorgung":
+            ausgabe.append(f"     {BLAU}« {ohne_t2(proz)} fertig: {name}{AUS}")
+        elif "Timer" in typ_:
+            ausgabe.append(f"     ⏰ Frist abgelaufen: {name}")
+        elif typ_ in ("serviceTask", "sendTask", "receiveTask", "businessRuleTask", "userTask") or (typ_ == "messageEndEvent" and w):
+            von = "echter Worker" if w and w != "pfad-py" else "pfad.py" if w else "DMN" if typ_ == "businessRuleTask" \
+                else "Tasklist" if typ_ == "userTask" else "Nachricht" if typ_ == "receiveTask" else ""
+            info = [f"{LABEL[n]}: {wert(n, v)}" + (f" (vorher {wert(n, alt)})" if alt not in (None, v) and n not in ("freigabeBegruendung", "pruefbegruendung") else "")
+                    for n, alt, v in gesetzt.get(ai, []) if n in LABEL]
+            if not info and topic in HINWEIS: info = [HINWEIS[topic]]
+            farbe = GRUEN if von == "echter Worker" else BLAU
+            ausgabe.append(f"     ✓ {name:36} {farbe}{('[' + von + ']') if von else '':16}{AUS} {', '.join(info)}")
+            grund = warum(aid, schnapp.get(ai, STAND))
+            if grund: ausgabe.append(f"       {' ':36} {' ':16} {GELB}↳ {grund}{AUS}")
+    global BLOCK_OFFEN
+    if ausgabe: print((f"{GELB}   Was passiert ist:{AUS}\n" if not BLOCK_OFFEN else "") + "\n".join(ausgabe)); BLOCK_OFFEN = True
+    statuszeile()
 
 def haltepunkt(pi):
     ids = baum(pi)
@@ -184,17 +304,25 @@ def ist_echt(name): return name in ECHT and not ALLES
 
 def auf_echt_warten(was, offen):
     """Wartet, bis ein echter Worker/Sender den Haltepunkt erledigt hat. offen() liefert, was noch offen ist."""
-    print(f"   {BLAU}{was}: pfad.py simuliert hier nichts und wartet (Strg+C = Pause, weiter mit: {CMD} weiter) ...{AUS}")
+    global BLOCK_OFFEN
+    sek = 0
     while True:
         o = offen()
-        if not o: print(f"   {GRUEN}vom echten Teil erledigt.{AUS}"); return
+        if not o: return
+        if sek == 2: print(f"\n   ⏳ {was} ... (Strg+C = Pause)"); BLOCK_OFFEN = False  # erst melden, wenn es wirklich dauert
         if o[0].get("retries") == 0:  # Worker hat handleFailure ohne Retries gemeldet -> Incident
             sys.exit(f"{ROT}Der echte Worker meldet einen Fehler (Incident): {o[0].get('errorMessage')}. Im Cockpit nachsehen.{AUS}")
-        time.sleep(1)
+        time.sleep(1); sek += 1
+
+def kopf(nr, name, proz, wo, wer, technik):
+    global BLOCK_OFFEN; BLOCK_OFFEN = False
+    print(f"\n{FETT}━━ Schritt {nr}: {name} {AUS}{BLAU}({ohne_t2(proz)}{', Teilprozess' if wo != 'Hauptprozess' else ''}){AUS}"
+          + (f"  [{technik}]" if DETAILS else ""))
+    print(f"   In echt: {wer}")
 
 def spielen(pi, fortsetzen=False):
     if fortsetzen: neu_gelaufen(pi, zeigen=False)  # Bisheriges nicht nochmal auflisten
-    schritt = 0
+    schritt = warte = 0
     while True:
         h = call("GET", f"/history/process-instance/{pi}")
         neu_gelaufen(pi)
@@ -207,7 +335,9 @@ def spielen(pi, fortsetzen=False):
             if os.path.exists(MERKER): os.remove(MERKER)
             return
         art, x = haltepunkt(pi)
-        schritt += 1
+        if art is None and warte < 5:  # Instanz ist evtl. gerade fertig geworden oder ein Worker schließt gerade ab
+            warte += 1; time.sleep(1); continue
+        warte = 0
         if art is None:
             inc = [i for p in baum(pi) for i in call("GET", f"/incident?processInstanceId={p}")]
             sys.exit(f"{ROT}Die Instanz hängt (kein Haltepunkt gefunden). Incidents: {[i['incidentMessage'] for i in inc]}{AUS}")
@@ -216,24 +346,22 @@ def spielen(pi, fortsetzen=False):
         if art == "ext":
             name = aktivitaet_name(x["processInstanceId"], x["activityId"])
             wer, optionen = TOPICS.get(x["topicName"], ("Unbekanntes Topic", NUR_ABSCHLIESSEN))
-            print(f"\n{FETT}Schritt {schritt} | {proz} ({wo}) | '{name}'{AUS}  [ID {x['activityId']}, External Task, Topic {x['topicName']}]")
-            print(f"   In echt: {wer}")
-            print(f"   Cockpit: Die Instanz steht jetzt auf '{name}' (blaue Markierung mit Zahl 1).")
             fremd = x.get("lockExpirationTime") and x.get("workerId") != "pfad-py"
             if ist_echt(x["topicName"]) or fremd:
-                auf_echt_warten("Echter Worker" + (f" '{x['workerId']}' arbeitet gerade" if fremd else " (steht in ECHT)"),
+                auf_echt_warten(f"'{name}': warte auf echten Worker" + (f" {x['workerId']}" if fremd else ""),
                                 lambda: call("GET", f"/external-task?externalTaskId={x['id']}"))
                 continue
+            schritt += 1
+            kopf(schritt, name, proz, wo, wer, f"External Task {x['activityId']}, Topic {x['topicName']}")
             text, werte, _ = waehle(optionen)
             l = call("POST", "/external-task/fetchAndLock", {"workerId": "pfad-py", "maxTasks": 1,
                      "topics": [{"topicName": x["topicName"], "lockDuration": 60000, "processInstanceIdIn": [x["processInstanceId"]]}]})
             if not l:  # hat ein anderer Worker die Aufgabe geschnappt? Dann nochmal schauen
                 print(f"{ROT}   Aufgabe war schon gesperrt (läuft ein echter Worker?). Ich schaue nochmal nach.{AUS}"); time.sleep(2); continue
             call("POST", f"/external-task/{l[0]['id']}/complete", {"workerId": "pfad-py", "variables": vars_(werte)})
-            if werte: print(f"   gesetzt: {werte if len(str(werte)) < 200 else list(werte)}")
         elif art == "user":
-            print(f"\n{FETT}Schritt {schritt} | {proz} ({wo}) | '{x['name']}'{AUS}  [ID {x['taskDefinitionKey']}, Benutzeraufgabe]")
-            print("   In echt: Ein Mensch der Prüfstelle entscheidet in der Tasklist.")
+            schritt += 1
+            kopf(schritt, x["name"], proz, wo, "Ein Mensch der Prüfstelle entscheidet in der Tasklist.", f"Benutzeraufgabe {x['taskDefinitionKey']}")
             print(f"   {FETT}Jetzt DU in der Tasklist:{AUS} http://localhost:8080/webapp/ -> Tasklist -> Filter 'My Group Tasks' (oder 'All Tasks')")
             print("   -> Aufgabe 'Grenzfall prüfen' öffnen -> 'Beanspruchen' -> Prüfergebnis wählen:")
             print(f"      {BLAU}'Kundenfreigabe einholen' -> Teilprozess Kundenentscheidung{AUS}")
@@ -249,19 +377,15 @@ def spielen(pi, fortsetzen=False):
                 while call("GET", f"/task?taskId={x['id']}"):
                     e = input("   Enter drücken, wenn du die Aufgabe abgeschlossen hast (q = Pause): ").strip().lower()
                     if e == "q": print(f"Pausiert. Weiter mit:  {CMD} weiter"); sys.exit(0)
-            werte = {v["name"]: v["value"] for v in call("GET", f"/history/variable-instance?processInstanceId={x['processInstanceId']}"
-                                                                  "&variableNameIn=pruefergebnis,pruefbegruendung")}
-            print(f"   {GRUEN}in der Tasklist eingegeben: Prüfergebnis = {werte.get('pruefergebnis')}, "
-                  f"Begründung = „{werte.get('pruefbegruendung')}“{AUS}")
         else:
             name = aktivitaet_name(x["processInstanceId"], x["activityId"])
             wer, optionen = NACHRICHTEN.get(x["eventName"], ("Unbekannte Nachricht", [("Senden", {}, "weiter")]))
-            print(f"\n{FETT}Schritt {schritt} | {proz} ({wo}) | '{name}'{AUS}  [ID {x['activityId']}, wartet auf Nachricht {x['eventName']}]")
-            print(f"   In echt: {wer}")
             if ist_echt(x["eventName"]):
-                auf_echt_warten("Echter Sender (steht in ECHT)",
+                auf_echt_warten(f"'{name}': warte auf echte Nachricht {x['eventName']}",
                                 lambda: call("GET", f"/event-subscription?eventType=message&executionId={x['executionId']}&eventName={x['eventName']}"))
                 continue
+            schritt += 1
+            kopf(schritt, name, proz, wo, wer, f"wartet auf Nachricht {x['eventName']}")
             text, werte, _ = waehle(optionen)
             if werte is FRIST:
                 jobs = call("GET", f"/job?processInstanceId={x['processInstanceId']}&timers=true")
@@ -270,7 +394,7 @@ def spielen(pi, fortsetzen=False):
             else:
                 call("POST", "/message", {"messageName": x["eventName"], "processInstanceId": x["processInstanceId"],
                                           "processVariables": vars_(werte)})
-                print(f"   Nachricht {x['eventName']} gesendet{' mit ' + str(werte) if werte else ''}.")
+                if DETAILS: print(f"   Nachricht {x['eventName']} gesendet{' mit ' + str(werte) if werte else ''}.")
         if not VORAUSWAHL: time.sleep(0.3)
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -351,6 +475,7 @@ if __name__ == "__main__":
     if "--wahl" in a:
         i = a.index("--wahl"); VORAUSWAHL[:] = a[i + 1].split(","); del a[i:i + 2]
     if "--alles-simulieren" in a: ALLES = True; a.remove("--alles-simulieren")
+    if "--details" in a: DETAILS = True; a.remove("--details")
     befehl = a[0] if a else "hilfe"
     try:
         if befehl == "einrichten": einrichten()
